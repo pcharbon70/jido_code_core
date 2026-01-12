@@ -7,6 +7,7 @@ defmodule JidoCodeCore.Application do
   - Settings management (global + local JSON configuration)
   - Memory subsystem (short-term and long-term memory stores)
   - PubSub for inter-process communication
+  - Agent system (LLM agents for AI interaction)
 
   The Application starts minimal infrastructure children that are shared
   between JidoCode and other consumers of the Core library.
@@ -25,6 +26,12 @@ defmodule JidoCodeCore.Application do
 
       # Registry for session process lookup (Session.Supervisor, Manager, State)
       {Registry, keys: :unique, name: JidoCodeCore.Session.ProcessRegistry},
+
+      # Task.Supervisor for async task supervision
+      {Task.Supervisor, name: JidoCodeCore.TaskSupervisor},
+
+      # Session supervisor (DynamicSupervisor for session processes)
+      JidoCodeCore.SessionSupervisor,
 
       # Memory subsystem supervisor (manages StoreManager for long-term memory)
       JidoCodeCore.Memory.Supervisor

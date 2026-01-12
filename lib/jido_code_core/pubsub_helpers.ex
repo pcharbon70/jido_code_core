@@ -54,13 +54,13 @@ defmodule JidoCodeCore.PubSubHelpers do
   """
   @spec broadcast(String.t() | nil, term()) :: :ok
   def broadcast(nil, message) do
-    Phoenix.PubSub.broadcast(JidoCode.PubSub, @global_topic, message)
+    Phoenix.PubSub.broadcast(JidoCodeCore.PubSub, @global_topic, message)
   end
 
   def broadcast(session_id, message) when is_binary(session_id) do
     # ARCH-2: Broadcast to both session-specific AND global topics
-    Phoenix.PubSub.broadcast(JidoCode.PubSub, session_topic(session_id), message)
-    Phoenix.PubSub.broadcast(JidoCode.PubSub, @global_topic, message)
+    Phoenix.PubSub.broadcast(JidoCodeCore.PubSub, session_topic(session_id), message)
+    Phoenix.PubSub.broadcast(JidoCodeCore.PubSub, @global_topic, message)
   end
 
   @doc """
