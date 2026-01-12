@@ -1,6 +1,6 @@
 defmodule JidoCodeCore.API.Session do
   @moduledoc """
-  Public API for session management in JidoCode.Core.
+  Public API for session management in JidoCodeCore.
 
   This module provides the interface for creating, managing, and stopping
   work sessions (isolated project contexts). Sessions are the primary

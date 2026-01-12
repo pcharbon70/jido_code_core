@@ -36,8 +36,8 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
 
   """
 
-  alias JidoCode.Memory
-  alias JidoCode.Memory.Types
+  alias JidoCodeCore.Memory
+  alias JidoCodeCore.Memory.Types
 
   # Default confidence values by memory type
   @default_confidence %{
@@ -725,7 +725,7 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
     existing memories without replacing the entire memory content.
     """
 
-    alias JidoCode.Memory
+    alias JidoCodeCore.Memory
     alias JidoCodeCore.Tools.Handlers.Knowledge
 
     @doc """
@@ -911,7 +911,7 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
     general decisions, architectural decisions, and implementation decisions.
     """
 
-    alias JidoCode.Memory
+    alias JidoCodeCore.Memory
     alias JidoCodeCore.Tools.Handlers.Knowledge
 
     # Decision types from the ontology
@@ -1013,7 +1013,7 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
     (severity/likelihood) in descending order.
     """
 
-    alias JidoCode.Memory
+    alias JidoCodeCore.Memory
     alias JidoCodeCore.Tools.Handlers.Knowledge
 
     # Default limit for results
@@ -1084,7 +1084,7 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
     memories, including evidence chains, replacement history, and similarity.
     """
 
-    alias JidoCode.Memory
+    alias JidoCodeCore.Memory
     alias JidoCodeCore.Tools.Handlers.Knowledge
 
     @valid_relationships [:derived_from, :superseded_by, :supersedes, :same_type, :same_project]
@@ -1215,7 +1215,7 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
     Memories are sorted by relevance score descending.
     """
 
-    alias JidoCode.Memory
+    alias JidoCodeCore.Memory
     alias JidoCodeCore.Tools.Handlers.Knowledge
 
     # C1 fix: Renamed max_results to limit for consistency with other handlers

@@ -1,13 +1,13 @@
 defmodule JidoCodeCore.Agents.LLMAgent do
   @moduledoc """
-  LLM Agent for handling chat interactions in JidoCode.
+  LLM Agent for handling chat interactions in JidoCodeCore.
 
   This agent wraps JidoAI's Agent system to provide a coding assistant
   that can be configured with different LLM providers and models at runtime.
 
   ## Usage
 
-      # Start with default config from JidoCode.Config
+      # Start with default config from JidoCodeCore.Config
       {:ok, pid} = JidoCodeCore.Agents.LLMAgent.start_link()
 
       # Start with custom options
@@ -55,7 +55,7 @@ defmodule JidoCodeCore.Agents.LLMAgent do
 
   This agent can be started under the AgentSupervisor for lifecycle management:
 
-      JidoCode.AgentSupervisor.start_agent(%{
+      JidoCodeCore.AgentSupervisor.start_agent(%{
         name: :llm_agent,
         module: JidoCodeCore.Agents.LLMAgent,
         args: []
@@ -275,7 +275,7 @@ defmodule JidoCodeCore.Agents.LLMAgent do
   ## Example
 
       {:ok, session_id, topic} = JidoCodeCore.Agents.LLMAgent.get_session_info(pid)
-      Phoenix.PubSub.subscribe(JidoCode.PubSub, topic)
+      Phoenix.PubSub.subscribe(JidoCodeCore.PubSub, topic)
   """
   @spec get_session_info(GenServer.server()) :: {:ok, String.t(), String.t()}
   def get_session_info(pid) do
@@ -313,7 +313,7 @@ defmodule JidoCodeCore.Agents.LLMAgent do
   ## Example
 
       topic = JidoCodeCore.Agents.LLMAgent.topic_for_session("user-123")
-      Phoenix.PubSub.subscribe(JidoCode.PubSub, topic)
+      Phoenix.PubSub.subscribe(JidoCodeCore.PubSub, topic)
   """
   @spec topic_for_session(String.t()) :: String.t()
   def topic_for_session(session_id) when is_binary(session_id) do

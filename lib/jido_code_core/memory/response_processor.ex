@@ -32,7 +32,7 @@ defmodule JidoCodeCore.Memory.ResponseProcessor do
 
   require Logger
 
-  alias JidoCode.Session.State
+  alias JidoCodeCore.Session.State
 
   # =============================================================================
   # Constants

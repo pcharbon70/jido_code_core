@@ -54,7 +54,7 @@ defmodule JidoCodeCore.Memory.ContextBuilder do
   alias JidoCodeCore.Memory.Summarizer
   alias JidoCodeCore.Memory.TokenCounter
   alias JidoCodeCore.Memory.Types
-  alias JidoCode.Session.State
+  alias JidoCodeCore.Session.State
 
   # =============================================================================
   # Types

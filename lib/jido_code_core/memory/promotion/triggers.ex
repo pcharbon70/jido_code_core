@@ -227,7 +227,7 @@ defmodule JidoCodeCore.Memory.Promotion.Triggers do
           {:ok, non_neg_integer()} | {:error, term()}
   defp run_promotion(session_id, _trigger_type, _opts) do
     # Use Session.State.run_promotion_now/1 which handles state access
-    case JidoCode.Session.State.run_promotion_now(session_id) do
+    case JidoCodeCore.Session.State.run_promotion_now(session_id) do
       {:ok, count} ->
         {:ok, count}
 
@@ -257,7 +257,7 @@ defmodule JidoCodeCore.Memory.Promotion.Triggers do
           {:ok, _id} ->
             # Clear from pending memories if it has an ID
             if memory_item[:id] do
-              JidoCode.Session.State.clear_promoted_memories(session_id, [memory_item[:id]])
+              JidoCodeCore.Session.State.clear_promoted_memories(session_id, [memory_item[:id]])
             end
 
             {:ok, 1}

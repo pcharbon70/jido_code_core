@@ -11,7 +11,7 @@ defmodule JidoCodeCore.Tools.Manager do
   ## Deprecation Notice
 
   **The global Tools.Manager is deprecated.** For new code, use session-scoped
-  managers via `JidoCode.Session.Manager` instead.
+  managers via `JidoCodeCore.Session.Manager` instead.
 
   All API functions now accept an optional `:session_id` option. When provided,
   the call is delegated to `Session.Manager` for that session. When omitted,
@@ -84,7 +84,7 @@ defmodule JidoCodeCore.Tools.Manager do
   use GenServer
 
   alias JidoCodeCore.ErrorFormatter
-  alias JidoCode.Session
+  alias JidoCodeCore.Session
   alias JidoCodeCore.Tools.{Bridge, LuaUtils, Security}
 
   require Logger

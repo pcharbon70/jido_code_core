@@ -1,6 +1,6 @@
 defmodule JidoCodeCore.Session do
   @moduledoc """
-  Represents a work session in JidoCode.
+  Represents a work session in JidoCodeCore.
 
   A session encapsulates all context for working on a specific project:
   - Project directory and sandbox boundary

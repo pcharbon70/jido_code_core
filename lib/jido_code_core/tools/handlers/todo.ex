@@ -39,13 +39,13 @@ defmodule JidoCodeCore.Tools.Handlers.Todo do
 
   Todo updates are broadcast via PubSub for TUI display:
 
-      Phoenix.PubSub.broadcast(JidoCode.PubSub, "tui.events", {:todo_update, todos})
+      Phoenix.PubSub.broadcast(JidoCodeCore.PubSub, "tui.events", {:todo_update, todos})
   """
 
   require Logger
 
   alias JidoCodeCore.PubSubHelpers
-  alias JidoCode.Session.State, as: SessionState
+  alias JidoCodeCore.Session.State, as: SessionState
 
   @valid_statuses ["pending", "in_progress", "completed"]
 

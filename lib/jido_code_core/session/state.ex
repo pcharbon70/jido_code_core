@@ -55,11 +55,11 @@ defmodule JidoCodeCore.Session.State do
   alias JidoCodeCore.Session.ProcessRegistry
 
   # Memory modules
-  alias JidoCode.Memory.Promotion.Engine, as: PromotionEngine
-  alias JidoCode.Memory.Promotion.Triggers, as: PromotionTriggers
-  alias JidoCode.Memory.ShortTerm.AccessLog
-  alias JidoCode.Memory.ShortTerm.PendingMemories
-  alias JidoCode.Memory.ShortTerm.WorkingContext
+  alias JidoCodeCore.Memory.Promotion.Engine, as: PromotionEngine
+  alias JidoCodeCore.Memory.Promotion.Triggers, as: PromotionTriggers
+  alias JidoCodeCore.Memory.ShortTerm.AccessLog
+  alias JidoCodeCore.Memory.ShortTerm.PendingMemories
+  alias JidoCodeCore.Memory.ShortTerm.WorkingContext
 
   # ============================================================================
   # Configuration
@@ -597,7 +597,7 @@ defmodule JidoCodeCore.Session.State do
 
       iex> {:error, :not_found} = State.update_language("unknown", :python)
   """
-  @spec update_language(String.t(), JidoCode.Language.language() | String.t()) ::
+  @spec update_language(String.t(), JidoCodeCore.Language.language() | String.t()) ::
           {:ok, Session.t()} | {:error, :not_found | :invalid_language}
   def update_language(session_id, language) when is_binary(session_id) do
     call_state(session_id, {:update_language, language})

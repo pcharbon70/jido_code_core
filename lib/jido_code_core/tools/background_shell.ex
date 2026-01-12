@@ -17,7 +17,7 @@ defmodule JidoCodeCore.Tools.BackgroundShell do
                               │
                               ▼
   ┌─────────────────────────────────────────────────────────────┐
-  │  Task.Supervisor (JidoCode.TaskSupervisor)                   │
+  │  Task.Supervisor (JidoCodeCore.TaskSupervisor)                   │
   │  - Supervises background command Tasks                       │
   │  - Handles crash isolation                                   │
   └─────────────────────────────────────────────────────────────┘
@@ -277,7 +277,7 @@ defmodule JidoCodeCore.Tools.BackgroundShell do
 
     # Start the task
     task =
-      Task.Supervisor.async_nolink(JidoCode.TaskSupervisor, fn ->
+      Task.Supervisor.async_nolink(JidoCodeCore.TaskSupervisor, fn ->
         execute_command(shell_id, command, args, project_root)
       end)
 

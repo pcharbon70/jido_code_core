@@ -64,12 +64,12 @@ defmodule JidoCodeCore.Session.Manager do
 
   require Logger
 
-  alias JidoCode.ErrorFormatter
+  alias JidoCodeCore.ErrorFormatter
   alias JidoCodeCore.Session
   alias JidoCodeCore.Session.ProcessRegistry
-  alias JidoCode.Tools.Bridge
-  alias JidoCode.Tools.LuaUtils
-  alias JidoCode.Tools.Security
+  alias JidoCodeCore.Tools.Bridge
+  alias JidoCodeCore.Tools.LuaUtils
+  alias JidoCodeCore.Tools.Security
 
   @typedoc """
   Session Manager state.
@@ -175,7 +175,7 @@ defmodule JidoCodeCore.Session.Manager do
 
   - `{:ok, resolved_path}` - Path is valid and within boundary
   - `{:error, :not_found}` - Session manager not found
-  - `{:error, reason}` - Path validation failed (see `JidoCode.Tools.Security`)
+  - `{:error, reason}` - Path validation failed (see `JidoCodeCore.Tools.Security`)
 
   ## Examples
 

@@ -162,7 +162,7 @@ defmodule JidoCodeCore.Tools.Handlers.FileSystem do
   """
   @spec track_file_write(String.t(), map(), atom()) :: :ok
   def track_file_write(normalized_path, context, operation \\ :file_system) do
-    alias JidoCode.Session.State, as: SessionState
+    alias JidoCodeCore.Session.State, as: SessionState
 
     case Map.get(context, :session_id) do
       nil ->
@@ -245,7 +245,7 @@ defmodule JidoCodeCore.Tools.Handlers.FileSystem do
     `session_id` context in production to enforce read-before-write validation.
     """
 
-    alias JidoCode.Session.State, as: SessionState
+    alias JidoCodeCore.Session.State, as: SessionState
     alias JidoCodeCore.Tools.HandlerHelpers
     alias JidoCodeCore.Tools.Handlers.FileSystem
     alias JidoCodeCore.Tools.Security
@@ -760,7 +760,7 @@ defmodule JidoCodeCore.Tools.Handlers.FileSystem do
     In legacy mode (no session_id), this check is skipped.
     """
 
-    alias JidoCode.Session.State, as: SessionState
+    alias JidoCodeCore.Session.State, as: SessionState
     alias JidoCodeCore.Tools.HandlerHelpers
     alias JidoCodeCore.Tools.Handlers.FileSystem
     alias JidoCodeCore.Tools.Security
@@ -1233,7 +1233,7 @@ defmodule JidoCodeCore.Tools.Handlers.FileSystem do
     same file.
     """
 
-    alias JidoCode.Session.State, as: SessionState
+    alias JidoCodeCore.Session.State, as: SessionState
     alias JidoCodeCore.Tools.HandlerHelpers
     alias JidoCodeCore.Tools.Handlers.FileSystem
     alias JidoCodeCore.Tools.Security
@@ -1389,7 +1389,7 @@ defmodule JidoCodeCore.Tools.Handlers.FileSystem do
     which is not reliably available in Elixir/Erlang's file APIs.
     """
 
-    alias JidoCode.Session.State, as: SessionState
+    alias JidoCodeCore.Session.State, as: SessionState
     alias JidoCodeCore.Tools.HandlerHelpers
     alias JidoCodeCore.Tools.Handlers.FileSystem
     alias JidoCodeCore.Tools.Security

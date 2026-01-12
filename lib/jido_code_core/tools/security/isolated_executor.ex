@@ -25,7 +25,7 @@ defmodule JidoCodeCore.Tools.Security.IsolatedExecutor do
 
   - `:timeout` - Execution timeout in milliseconds (default: 30_000)
   - `:max_heap_size` - Maximum heap size in words (default: 1_000_000 ~= 8MB on 64-bit)
-  - `:supervisor` - Task.Supervisor to use (default: JidoCode.TaskSupervisor)
+  - `:supervisor` - Task.Supervisor to use (default: JidoCodeCore.TaskSupervisor)
 
   ## Telemetry
 
@@ -40,7 +40,7 @@ defmodule JidoCodeCore.Tools.Security.IsolatedExecutor do
 
   @default_timeout 30_000
   @default_max_heap_size 1_000_000
-  @default_supervisor JidoCode.TaskSupervisor
+  @default_supervisor JidoCodeCore.TaskSupervisor
 
   @typedoc """
   Options for isolated execution.

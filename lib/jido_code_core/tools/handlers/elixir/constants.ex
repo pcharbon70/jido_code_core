@@ -14,13 +14,13 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir.Constants do
   @spec blocked_prefixes() :: [String.t()]
   def blocked_prefixes do
     [
-      # JidoCode internal processes
-      "JidoCode.Tools",
-      "JidoCode.Session",
-      "JidoCode.Registry",
-      "Elixir.JidoCode.Tools",
-      "Elixir.JidoCode.Session",
-      "Elixir.JidoCode.Registry",
+      # JidoCodeCore internal processes
+      "JidoCodeCore.Tools",
+      "JidoCodeCore.Session",
+      "JidoCodeCore.Registry",
+      "Elixir.JidoCodeCore.Tools",
+      "Elixir.JidoCodeCore.Session",
+      "Elixir.JidoCodeCore.Registry",
       # Erlang kernel and runtime
       ":kernel",
       ":stdlib",

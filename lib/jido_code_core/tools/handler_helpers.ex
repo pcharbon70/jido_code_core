@@ -63,9 +63,9 @@ defmodule JidoCodeCore.Tools.HandlerHelpers do
 
   require Logger
 
-  alias JidoCode.Session
+  alias JidoCodeCore.Session
   alias JidoCodeCore.Tools.{Manager, Security}
-  alias JidoCode.Utils.UUID, as: UUIDUtils
+  alias JidoCodeCore.Utils.UUID, as: UUIDUtils
 
   @doc """
   Extracts the project root from the context map.

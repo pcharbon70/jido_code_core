@@ -28,8 +28,8 @@ defmodule JidoCodeCore.Tools.Handlers.Task do
 
   require Logger
 
-  alias JidoCode.Agents.TaskAgent
-  alias JidoCode.AgentSupervisor
+  alias JidoCodeCore.Agents.TaskAgent
+  alias JidoCodeCore.AgentSupervisor
 
   @default_timeout 60_000
   @max_timeout 300_000

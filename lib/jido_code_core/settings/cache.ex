@@ -11,7 +11,7 @@ defmodule JidoCodeCore.Settings.Cache do
 
   ## Usage
 
-  This module is started automatically by `JidoCode.Application`.
+  This module is started automatically by `JidoCodeCore.Application`.
   Use `JidoCodeCore.Settings` functions to interact with settings - they
   will use this cache internally.
 
