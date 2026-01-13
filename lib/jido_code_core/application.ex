@@ -25,7 +25,7 @@ defmodule JidoCodeCore.Application do
       {Phoenix.PubSub, name: JidoCodeCore.PubSub},
 
       # Registry for session process lookup (Session.Supervisor, Manager, State)
-      {Registry, keys: :unique, name: JidoCodeCore.Session.ProcessRegistry},
+      {Registry, keys: :unique, name: JidoCodeCore.SessionProcessRegistry},
 
       # Task.Supervisor for async task supervision
       {Task.Supervisor, name: JidoCodeCore.TaskSupervisor},
