@@ -284,7 +284,10 @@ defmodule JidoCodeCore.API.Session do
           {:ok, Session.t()} | {:error, :not_found | [atom()]}
   def set_session_config(session_id, config)
       when is_binary(session_id) and is_map(config) do
-    State.update_session_config(session_id, config)
+    with {:ok, updated_session} <- State.update_session_config(session_id, config),
+         {:ok, _} <- SessionRegistry.update(updated_session) do
+      {:ok, updated_session}
+    end
   end
 
   @doc """
@@ -323,7 +326,10 @@ defmodule JidoCodeCore.API.Session do
   @spec set_session_language(String.t(), language()) ::
           {:ok, Session.t()} | {:error, :not_found | :invalid_language}
   def set_session_language(session_id, language) when is_binary(session_id) do
-    State.update_language(session_id, language)
+    with {:ok, updated_session} <- State.update_language(session_id, language),
+         {:ok, _} <- SessionRegistry.update(updated_session) do
+      {:ok, updated_session}
+    end
   end
 
   @doc """

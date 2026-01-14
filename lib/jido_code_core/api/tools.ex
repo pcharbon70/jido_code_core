@@ -374,8 +374,7 @@ defmodule JidoCodeCore.API.Tools do
 
   @spec generate_call_id() :: String.t()
   defp generate_call_id do
-    # Use a simple counter-based ID or UUID
-    {micro, _} = Process.info(self(), :monotonic_time) || {0, 0}
+    # Use a unique integer for call ID
     "call_#{:erlang.unique_integer([:positive, :monotonic])}"
   end
 end
