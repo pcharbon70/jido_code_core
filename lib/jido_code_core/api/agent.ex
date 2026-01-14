@@ -395,9 +395,6 @@ defmodule JidoCodeCore.API.Agent do
 
   @spec find_agent(String.t()) :: {:ok, pid()} | {:error, :not_found}
   defp find_agent(session_id) do
-    case ProcessRegistry.whereis(:agent, session_id) do
-      nil -> {:error, :not_found}
-      pid when is_pid(pid) -> {:ok, pid}
-    end
+    ProcessRegistry.lookup(:agent, session_id)
   end
 end

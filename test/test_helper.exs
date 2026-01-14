@@ -1,3 +1,11 @@
+# Set dummy API keys for testing BEFORE application starts
+# This ensures Jido.AI.Keyring can pick up the keys when the application initializes
+System.put_env("ANTHROPIC_API_KEY", "sk-test-dummy-key")
+System.put_env("OPENAI_API_KEY", "sk-test-dummy-key")
+System.put_env("GOOGLE_API_KEY", "test-dummy-key")
+System.put_env("GROQ_API_KEY", "gsk-test-dummy-key")
+System.put_env("OPENROUTER_API_KEY", "sk-or-test-dummy-key")
+
 # Compile test support modules
 Code.require_file("support/env_isolation.exs", __DIR__)
 Code.require_file("support/session_isolation.exs", __DIR__)

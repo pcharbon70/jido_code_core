@@ -494,7 +494,9 @@ defmodule JidoCodeCore.Agents.LLMAgent do
   """
   @spec list_providers() :: {:ok, [atom()]} | {:error, term()}
   def list_providers do
-    RegistryAdapter.list_providers()
+    # TODO: Replace with RegistryAdapter.list_providers() when available in jido_ai
+    # For now, return a static list of known providers
+    {:ok, [:anthropic, :openai, :google, :groq, :openrouter]}
   end
 
   @doc """
@@ -1427,7 +1429,7 @@ defmodule JidoCodeCore.Agents.LLMAgent do
   end
 
   defp validate_provider(provider) do
-    case RegistryAdapter.list_providers() do
+    case list_providers() do
       {:ok, providers} ->
         if provider in providers do
           :ok
@@ -1441,37 +1443,15 @@ defmodule JidoCodeCore.Agents.LLMAgent do
            "Provider '#{provider}' not found. Available providers include: #{available}... (#{length(providers)} total)"}
         end
 
-      {:error, {:registry_error, _}} ->
-        # Fall back to allowing any provider if registry unavailable
-        Logger.warning("Provider registry unavailable, skipping provider validation")
-        :ok
-
       {:error, reason} ->
         {:error, "Failed to validate provider: #{inspect(reason)}"}
     end
   end
 
-  defp validate_model(provider, model) do
-    if RegistryAdapter.model_exists?(provider, model) do
-      :ok
-    else
-      {:error, model_not_found_error(provider, model)}
-    end
-  end
-
-  defp model_not_found_error(provider, model) do
-    case RegistryAdapter.list_models(provider) do
-      {:ok, models} ->
-        available =
-          models
-          |> Enum.take(5)
-          |> Enum.map_join(", ", fn m -> Map.get(m, :model, "unknown") end)
-
-        "Model '#{model}' not found for provider '#{provider}'. Available models include: #{available}..."
-
-      {:error, _} ->
-        "Model '#{model}' not found for provider '#{provider}'"
-    end
+  defp validate_model(_provider, _model) do
+    # TODO: Implement model validation when RegistryAdapter.model_exists? is available in jido_ai
+    # For now, always allow any model
+    :ok
   end
 
   defp validate_api_key(provider) do
