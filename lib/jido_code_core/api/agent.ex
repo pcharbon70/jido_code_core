@@ -335,7 +335,7 @@ defmodule JidoCodeCore.API.Agent do
   @spec execute_tools_batch(String.t(), [map()], keyword()) ::
           {:ok, [term()]} | {:error, term()}
   def execute_tools_batch(session_id, tool_calls, opts \\ [])
-      when is_binary(session_id) and is_list(tool_calls) do
+      when is_binary(session_id) and is_list(tool_calls) and is_list(opts) do
     with {:ok, pid} <- find_agent(session_id),
          {:ok, results} <- LLMAgent.execute_tool_batch(pid, tool_calls, opts) do
       {:ok, results}

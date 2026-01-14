@@ -11,6 +11,7 @@ Code.require_file("support/env_isolation.exs", __DIR__)
 Code.require_file("support/session_isolation.exs", __DIR__)
 Code.require_file("support/session_test_helpers.exs", __DIR__)
 Code.require_file("support/memory_test_helpers.exs", __DIR__)
+Code.require_file("support/session_supervisor_stub.ex", __DIR__)
 
 # Ensure JidoCodeCore application infrastructure is started before running tests
 # This ensures all GenServers, Registries, and Supervisors are initialized
