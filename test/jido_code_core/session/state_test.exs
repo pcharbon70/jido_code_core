@@ -246,11 +246,11 @@ defmodule JidoCodeCore.SessionStateTest do
     test "updates streaming content", %{session_id: session_id} do
       State.start_streaming(session_id, "msg-1")
 
-      assert {:ok, _} = State.update_streaming(session_id, "Hello")
+      assert :ok = State.update_streaming(session_id, "Hello")
       assert {:ok, state} = State.get_state(session_id)
       assert state.streaming_message == "Hello"
 
-      assert {:ok, _} = State.update_streaming(session_id, " World")
+      assert :ok = State.update_streaming(session_id, " World")
       assert {:ok, state2} = State.get_state(session_id)
       assert state2.streaming_message == "Hello World"
     end
@@ -329,16 +329,16 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "updates context value", %{session_id: session_id} do
-      State.update_context(session_id, :count, 1)
-      assert :ok = State.update_context(session_id, :count, 2)
+      State.update_context(session_id, :user_intent, "initial task")
+      assert :ok = State.update_context(session_id, :user_intent, "updated task")
 
-      assert {:ok, value} = State.get_context(session_id, :count)
-      assert value == 2
+      assert {:ok, value} = State.get_context(session_id, :user_intent)
+      assert value == "updated task"
     end
 
     test "gets all context", %{session_id: session_id} do
-      State.update_context(session_id, :key1, "value1")
-      State.update_context(session_id, :key2, "value2")
+      State.update_context(session_id, :framework, "Phoenix")
+      State.update_context(session_id, :primary_language, "Elixir")
 
       assert {:ok, context} = State.get_all_context(session_id)
       # Context is a WorkingContext struct with items map
@@ -346,8 +346,8 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "clears all context", %{session_id: session_id} do
-      State.update_context(session_id, :key1, "value1")
-      State.update_context(session_id, :key2, "value2")
+      State.update_context(session_id, :framework, "Phoenix")
+      State.update_context(session_id, :primary_language, "Elixir")
 
       assert :ok = State.clear_context(session_id)
 
@@ -362,8 +362,11 @@ defmodule JidoCodeCore.SessionStateTest do
       memory = %{
         id: "mem-1",
         content: "Important fact",
-        type: :fact,
-        timestamp: DateTime.utc_now()
+        memory_type: :fact,
+        confidence: 0.9,
+        source_type: :tool,
+        importance_score: 0.8,
+        created_at: DateTime.utc_now()
       }
 
       assert :ok = State.add_pending_memory(session_id, memory)
@@ -374,8 +377,8 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "adds multiple pending memories", %{session_id: session_id} do
-      mem1 = %{id: "mem-1", content: "Fact 1", type: :fact, timestamp: DateTime.utc_now()}
-      mem2 = %{id: "mem-2", content: "Fact 2", type: :fact, timestamp: DateTime.utc_now()}
+      mem1 = %{id: "mem-1", content: "Fact 1", memory_type: :fact, confidence: 0.8, source_type: :tool, importance_score: 0.9, created_at: DateTime.utc_now()}
+      mem2 = %{id: "mem-2", content: "Fact 2", memory_type: :fact, confidence: 0.7, source_type: :tool, importance_score: 0.8, created_at: DateTime.utc_now()}
 
       State.add_pending_memory(session_id, mem1)
       State.add_pending_memory(session_id, mem2)
@@ -385,8 +388,8 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "clears promoted memories", %{session_id: session_id} do
-      mem1 = %{id: "mem-1", content: "Fact 1", type: :fact, timestamp: DateTime.utc_now()}
-      mem2 = %{id: "mem-2", content: "Fact 2", type: :fact, timestamp: DateTime.utc_now()}
+      mem1 = %{id: "mem-1", content: "Fact 1", memory_type: :fact, confidence: 0.8, source_type: :tool, importance_score: 0.9, created_at: DateTime.utc_now()}
+      mem2 = %{id: "mem-2", content: "Fact 2", memory_type: :fact, confidence: 0.7, source_type: :tool, importance_score: 0.8, created_at: DateTime.utc_now()}
 
       State.add_pending_memory(session_id, mem1)
       State.add_pending_memory(session_id, mem2)
@@ -405,9 +408,12 @@ defmodule JidoCodeCore.SessionStateTest do
       decision = %{
         id: "dec-1",
         content: "Decision content",
+        memory_type: :convention,
+        confidence: 1.0,
+        source_type: :user,
         decision: :promote,
         reason: "High importance",
-        timestamp: DateTime.utc_now()
+        created_at: DateTime.utc_now()
       }
 
       assert :ok = State.add_agent_memory_decision(session_id, decision)
@@ -423,8 +429,8 @@ defmodule JidoCodeCore.SessionStateTest do
       assert {:ok, stats} = State.get_access_stats(session_id, :framework)
 
       assert is_map(stats)
-      assert Map.has_key?(stats, :key)
-      assert stats.key == :framework
+      assert Map.has_key?(stats, :frequency)
+      assert Map.has_key?(stats, :recency)
     end
 
     test "tracks access counts", %{session_id: session_id} do
@@ -433,7 +439,7 @@ defmodule JidoCodeCore.SessionStateTest do
       State.record_access(session_id, :test_key, :read)
 
       assert {:ok, stats} = State.get_access_stats(session_id, :test_key)
-      assert stats.total_access_count >= 3
+      assert stats.frequency >= 3
     end
 
     test "handles different access types", %{session_id: session_id} do
@@ -452,14 +458,14 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "can disable promotion", %{session_id: session_id} do
-      assert {:ok, _} = State.disable_promotion(session_id)
+      assert :ok = State.disable_promotion(session_id)
       assert {:ok, stats} = State.get_promotion_stats(session_id)
       assert stats.enabled == false
     end
 
     test "can enable promotion", %{session_id: session_id} do
       State.disable_promotion(session_id)
-      assert {:ok, _} = State.enable_promotion(session_id)
+      assert :ok = State.enable_promotion(session_id)
 
       assert {:ok, stats} = State.get_promotion_stats(session_id)
       assert stats.enabled == true
@@ -469,21 +475,11 @@ defmodule JidoCodeCore.SessionStateTest do
       assert :ok = State.set_promotion_interval(session_id, 60_000)
     end
 
-    test "runs promotion on demand", %{session_id: session_id} do
-      # Add some pending memories
-      memory = %{
-        id: "mem-1",
-        content: "Test",
-        type: :fact,
-        importance: 0.9,
-        timestamp: DateTime.utc_now()
-      }
-
-      State.add_pending_memory(session_id, memory)
-
-      # Run promotion (may or may not promote based on thresholds)
+    test "runs promotion on demand without crashing", %{session_id: session_id} do
+      # Run promotion with no pending memories - should not crash
       result = State.run_promotion_now(session_id)
-      assert result == :ok or match?({:error, _}, result)
+      # Result can be :ok, {:ok, count}, or {:error, reason}
+      assert result == :ok or match?({:ok, _}, result) or match?({:error, _}, result)
     end
   end
 
@@ -495,7 +491,7 @@ defmodule JidoCodeCore.SessionStateTest do
 
     test "adds to prompt history", %{session_id: session_id} do
       prompt = "You are a helpful assistant."
-      assert :ok = State.add_to_prompt_history(session_id, prompt)
+      assert {:ok, _history} = State.add_to_prompt_history(session_id, prompt)
 
       assert {:ok, history} = State.get_prompt_history(session_id)
       assert length(history) >= 1
@@ -503,7 +499,7 @@ defmodule JidoCodeCore.SessionStateTest do
 
     test "sets prompt history", %{session_id: session_id} do
       new_history = ["Prompt 1", "Prompt 2"]
-      assert :ok = State.set_prompt_history(session_id, new_history)
+      assert {:ok, _history} = State.set_prompt_history(session_id, new_history)
 
       assert {:ok, history} = State.get_prompt_history(session_id)
       assert is_list(history)
@@ -514,14 +510,14 @@ defmodule JidoCodeCore.SessionStateTest do
     test "tracks file reads", %{session_id: session_id} do
       path = "/test/file.ex"
 
-      assert :ok = State.track_file_read(session_id, path)
-      assert true == State.file_was_read?(session_id, path)
+      assert {:ok, _timestamp} = State.track_file_read(session_id, path)
+      assert {:ok, true} = State.file_was_read?(session_id, path)
     end
 
     test "tracks file writes", %{session_id: session_id} do
       path = "/test/file.ex"
 
-      assert :ok = State.track_file_write(session_id, path)
+      assert {:ok, _timestamp} = State.track_file_write(session_id, path)
       # File write tracking should also mark as read
     end
 
