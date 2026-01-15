@@ -1264,6 +1264,45 @@ defmodule JidoCodeCore.Session.State do
   end
 
   # ============================================================================
+  # Configuration Constants (for testing)
+  # ============================================================================
+
+  @doc """
+  Returns the maximum number of messages allowed in session history.
+  """
+  def max_messages, do: @max_messages
+
+  @doc """
+  Returns the maximum number of reasoning steps allowed.
+  """
+  def max_reasoning_steps, do: @max_reasoning_steps
+
+  @doc """
+  Returns the maximum number of tool calls allowed.
+  """
+  def max_tool_calls, do: @max_tool_calls
+
+  @doc """
+  Returns the maximum number of prompts in history.
+  """
+  def max_prompt_history, do: @max_prompt_history
+
+  @doc """
+  Returns the maximum number of file operations to track.
+  """
+  def max_file_operations, do: @max_file_operations
+
+  @doc """
+  Returns the maximum number of pending memories.
+  """
+  def max_pending_memories, do: @max_pending_memories
+
+  @doc """
+  Returns the maximum number of access log entries.
+  """
+  def max_access_log_entries, do: @max_access_log_entries
+
+  # ============================================================================
   # Server Callbacks
   # ============================================================================
 
