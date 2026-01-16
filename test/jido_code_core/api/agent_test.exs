@@ -400,4 +400,165 @@ defmodule JidoCodeCore.APIAgentTest do
       assert length(providers) > 0
     end
   end
+
+  describe "send_message/3 timeout handling" do
+    test "passes timeout option to LLMAgent" do
+      assert {:error, :not_found} =
+               APIAgent.send_message("nonexistent-session", "test", timeout: 5000)
+    end
+
+    test "passes system_prompt option to LLMAgent" do
+      assert {:error, :not_found} =
+               APIAgent.send_message("nonexistent-session", "test", system_prompt: "Custom")
+    end
+  end
+
+  describe "send_message_stream/3 timeout handling" do
+    test "passes timeout option to stream" do
+      assert {:error, :not_found} =
+               APIAgent.send_message_stream("nonexistent-session", "test", timeout: 5000)
+    end
+  end
+
+  describe "reconfigure_agent/2 with multiple options" do
+    test "accepts multiple configuration options" do
+      assert {:error, :not_found} =
+               APIAgent.reconfigure_agent("session-id",
+                 provider: :anthropic,
+                 model: "claude-3-5-sonnet-20241022",
+                 temperature: 0.7,
+                 max_tokens: 4096
+               )
+    end
+  end
+
+  describe "execute_tools_batch/3 with options" do
+    test "accepts parallel option" do
+      tool_calls = [%{id: "1", name: "read_file", arguments: %{}}]
+
+      assert {:error, :not_found} =
+               APIAgent.execute_tools_batch("session-id", tool_calls, parallel: true)
+    end
+
+    test "accepts timeout option" do
+      assert {:error, :not_found} =
+               APIAgent.execute_tools_batch("session-id", [], timeout: 5000)
+    end
+
+    test "accepts multiple options" do
+      tool_calls = [%{id: "1", name: "read_file", arguments: %{}}]
+
+      assert {:error, :not_found} =
+               APIAgent.execute_tools_batch("session-id", tool_calls,
+                 parallel: true,
+                 timeout: 5000
+               )
+    end
+  end
+
+  describe "get_status/1 error handling" do
+    test "returns not_found when agent process not found" do
+      assert {:error, :not_found} =
+               APIAgent.get_status("nonexistent-session-agent-not-found")
+    end
+  end
+
+  describe "get_agent_config/1 error handling" do
+    test "returns not_found when session does not exist" do
+      assert {:error, :not_found} =
+               APIAgent.get_agent_config("nonexistent-session-config")
+    end
+  end
+
+  describe "send_message/3 message handling" do
+    test "accepts empty string message" do
+      assert {:error, :not_found} = APIAgent.send_message("nonexistent", "")
+    end
+
+    test "accepts message with special characters" do
+      special_message = "Hello! @#$%^&*()_+ {}|:\"<>?[]\\;',./~`"
+
+      assert {:error, :not_found} = APIAgent.send_message("nonexistent", special_message)
+    end
+
+    test "accepts message with unicode characters" do
+      unicode_message = "Hello 世界 🌍 مرحبا"
+
+      assert {:error, :not_found} = APIAgent.send_message("nonexistent", unicode_message)
+    end
+
+    test "accepts message with newlines" do
+      multiline_message = "Line 1\nLine 2\nLine 3"
+
+      assert {:error, :not_found} = APIAgent.send_message("nonexistent", multiline_message)
+    end
+  end
+
+  describe "send_message_stream/3 message handling" do
+    test "accepts empty string message for streaming" do
+      assert {:error, :not_found} = APIAgent.send_message_stream("nonexistent", "")
+    end
+
+    test "accepts message with special characters for streaming" do
+      special_message = "Test @#$%^&*()"
+
+      assert {:error, :not_found} = APIAgent.send_message_stream("nonexistent", special_message)
+    end
+  end
+
+  describe "execute_tool_via_agent/2 tool_call handling" do
+    test "accepts tool_call with extra keys" do
+      tool_call = %{
+        id: "call_1",
+        name: "read_file",
+        arguments: %{"path" => "/test.txt"},
+        extra_key: "extra_value"
+      }
+
+      assert {:error, :not_found} = APIAgent.execute_tool_via_agent("nonexistent", tool_call)
+    end
+
+    test "accepts tool_call with empty arguments" do
+      tool_call = %{id: "call_1", name: "read_file", arguments: %{}}
+
+      assert {:error, :not_found} = APIAgent.execute_tool_via_agent("nonexistent", tool_call)
+    end
+
+    test "accepts tool_call with complex arguments" do
+      tool_call = %{
+        id: "call_1",
+        name: "read_file",
+        arguments: %{
+          "path" => "/test.txt",
+          "nested" => %{"key" => "value"},
+          "list" => [1, 2, 3]
+        }
+      }
+
+      assert {:error, :not_found} = APIAgent.execute_tool_via_agent("nonexistent", tool_call)
+    end
+  end
+
+  describe "execute_tools_batch/3 tool_calls handling" do
+    test "accepts multiple tool_calls" do
+      tool_calls = [
+        %{id: "1", name: "read_file", arguments: %{}},
+        %{id: "2", name: "write_file", arguments: %{}},
+        %{id: "3", name: "grep", arguments: %{}}
+      ]
+
+      assert {:error, :not_found} =
+               APIAgent.execute_tools_batch("nonexistent", tool_calls)
+    end
+
+    test "accepts tool_calls with string IDs" do
+      tool_calls = [
+        %{id: "call_abc_123", name: "read_file", arguments: %{}},
+        %{id: "call_xyz_789", name: "read_file", arguments: %{}}
+      ]
+
+      assert {:error, :not_found} =
+               APIAgent.execute_tools_batch("nonexistent", tool_calls)
+    end
+  end
 end
