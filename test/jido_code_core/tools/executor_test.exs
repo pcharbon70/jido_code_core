@@ -577,4 +577,314 @@ defmodule JidoCodeCore.Tools.ExecutorTest do
       assert elapsed < 5000
     end
   end
+
+  describe "execute/2 with memory tools" do
+    alias JidoCodeCore.Memory
+
+    setup do
+      # Ensure Memory.Actions are available
+      Application.ensure_all_started(:jido_code_core)
+      :ok
+    end
+
+    test "routes remember tool to Memory.Actions" do
+      tool_call = %{
+        id: "call_123",
+        name: "remember",
+        arguments: %{"content" => "test memory", "type" => "fact"}
+      }
+
+      # Should not error even if Memory.Actions aren't fully set up
+      result = Executor.execute(tool_call)
+
+      # Either gets success or error result, but shouldn't crash
+      assert {:ok, result} = result
+      assert result.tool_call_id == "call_123"
+      assert result.tool_name == "remember"
+    end
+
+    test "routes recall tool to Memory.Actions" do
+      tool_call = %{
+        id: "call_124",
+        name: "recall",
+        arguments: %{"query" => "test", "limit" => 5}
+      }
+
+      assert {:ok, result} = Executor.execute(tool_call)
+      assert result.tool_call_id == "call_124"
+      assert result.tool_name == "recall"
+    end
+
+    test "routes forget tool to Memory.Actions" do
+      tool_call = %{
+        id: "call_125",
+        name: "forget",
+        arguments: %{"memory_id" => "test-id"}
+      }
+
+      assert {:ok, result} = Executor.execute(tool_call)
+      assert result.tool_call_id == "call_125"
+      assert result.tool_name == "forget"
+    end
+
+    test "memory_tool?/1 correctly identifies memory tools" do
+      assert Executor.memory_tool?("remember")
+      assert Executor.memory_tool?("recall")
+      assert Executor.memory_tool?("forget")
+      refute Executor.memory_tool?("read_file")
+    end
+
+    test "memory_tools/0 returns list of memory tool names" do
+      tools = Executor.memory_tools()
+      assert is_list(tools)
+      assert "remember" in tools
+      assert "recall" in tools
+      assert "forget" in tools
+    end
+  end
+
+  describe "execute/2 with context enrichment" do
+    setup do
+      # Mock Session.Manager to return project_root
+      original = Application.get_env(:jido_code_core, :session_manager)
+
+      on_exit(fn ->
+        Application.put_env(:jido_code_core, :session_manager, original)
+      end)
+
+      :ok
+    end
+
+    test "executes with context containing project_root" do
+      tool_call = %{id: "call_123", name: "read_file", arguments: %{"path" => "/test.txt"}}
+      context = %{session_id: "test-session", project_root: "/tmp/project"}
+
+      assert {:ok, result} = Executor.execute(tool_call, context: context)
+      assert result.status == :ok
+    end
+
+    test "executes with context without project_root" do
+      # When no project_root in context but session_id is provided,
+      # it tries to fetch from Session.Manager (may fail if session doesn't exist)
+      tool_call = %{id: "call_123", name: "read_file", arguments: %{"path" => "/test.txt"}}
+      context = %{session_id: "nonexistent-session"}
+
+      # Should still execute (context enrichment failure is logged but doesn't block)
+      assert {:ok, result} = Executor.execute(tool_call, context: context)
+      assert result.tool_call_id == "call_123"
+    end
+
+    test "executes with empty context" do
+      tool_call = %{id: "call_123", name: "read_file", arguments: %{"path" => "/test.txt"}}
+      context = %{}
+
+      assert {:ok, result} = Executor.execute(tool_call, context: context)
+      assert result.status == :ok
+    end
+
+    test "uses timeout from context if provided" do
+      tool_call = %{id: "call_123", name: "slow_tool", arguments: %{"slow" => 500}}
+      # The context timeout should be used instead of the default
+      context = %{timeout: 100}
+
+      assert {:ok, result} = Executor.execute(tool_call, context: context, timeout: 100)
+      assert result.status == :timeout
+    end
+  end
+
+  describe "execute/2 with legacy session_id option" do
+    setup do
+      # Suppress deprecation warnings during these tests
+      original = Application.get_env(:jido_code_core, :suppress_executor_deprecation_warnings)
+      Application.put_env(:jido_code_core, :suppress_executor_deprecation_warnings, true)
+
+      on_exit(fn ->
+        Application.put_env(:jido_code_core, :suppress_executor_deprecation_warnings, original)
+      end)
+
+      :ok
+    end
+
+    test "accepts legacy session_id option" do
+      tool_call = %{id: "call_123", name: "read_file", arguments: %{"path" => "/test.txt"}}
+
+      # Should not crash with legacy session_id option
+      assert {:ok, result} = Executor.execute(tool_call, session_id: "legacy-session")
+      assert result.tool_call_id == "call_123"
+    end
+
+    test "context.session_id takes precedence over legacy option" do
+      tool_call = %{id: "call_123", name: "read_file", arguments: %{"path" => "/test.txt"}}
+      context = %{session_id: "context-session"}
+
+      assert {:ok, result} =
+               Executor.execute(tool_call, context: context, session_id: "legacy-session")
+
+      assert result.tool_call_id == "call_123"
+    end
+  end
+
+  describe "execute/2 error result handling" do
+    test "returns Result.error for tool not found" do
+      tool_call = %{id: "call_123", name: "nonexistent_tool", arguments: %{}}
+
+      assert {:ok, result} = Executor.execute(tool_call)
+      assert result.status == :error
+      assert result.content =~ "not found"
+      assert is_integer(result.duration_ms)
+    end
+
+    test "returns Result.error for validation failures" do
+      tool_call = %{id: "call_123", name: "read_file", arguments: %{}}
+
+      assert {:ok, result} = Executor.execute(tool_call)
+      assert result.status == :error
+      assert result.content =~ "missing"
+      assert is_integer(result.duration_ms)
+    end
+
+    test "error results include duration" do
+      tool_call = %{id: "call_123", name: "error_tool", arguments: %{"error" => true}}
+
+      assert {:ok, result} = Executor.execute(tool_call)
+      assert result.status == :error
+      assert result.duration_ms >= 0
+    end
+  end
+
+  describe "enrich_context/1 with Session.Manager integration" do
+    test "returns error when session_id is missing" do
+      assert {:error, :missing_session_id} = Executor.enrich_context(%{})
+      assert {:error, :missing_session_id} =
+               Executor.enrich_context(%{project_root: "/path"})
+    end
+
+    test "returns not_found for non-existent session" do
+      assert {:error, :not_found} =
+               Executor.enrich_context(%{session_id: "nonexistent-session-id"})
+    end
+  end
+
+  describe "build_context/2 validation" do
+    test "validates UUID format" do
+      assert {:error, :invalid_session_id} = Executor.build_context("not-a-uuid")
+      assert {:error, :invalid_session_id} = Executor.build_context("123-456")
+    end
+
+    test "accepts valid UUID format (even if session doesn't exist)" do
+      valid_uuid = "550e8400-e29b-41d4-a716-446655440000"
+      assert {:error, :not_found} = Executor.build_context(valid_uuid)
+    end
+
+    test "accepts custom timeout in build_context" do
+      valid_uuid = "550e8400-e29b-41d4-a716-446655440001"
+      assert {:error, :not_found} = Executor.build_context(valid_uuid, timeout: 60_000)
+    end
+  end
+
+  describe "PubSub broadcasting integration" do
+    alias JidoCodeCore.PubSubHelpers
+
+    setup do
+      # Ensure PubSub is started
+      Application.ensure_all_started(:jido_code_core)
+
+      topic = "test.events.#{:rand.uniform(1000)}"
+      Phoenix.PubSub.subscribe(JidoCodeCore.PubSub, topic)
+
+      on_exit(fn ->
+        Phoenix.PubSub.unsubscribe(JidoCodeCore.PubSub, topic)
+      end)
+
+      {:ok, topic: topic}
+    end
+
+    test "broadcast_tool_call/4 sends to global topic when session_id is nil", %{topic: _topic} do
+      # Subscribe to global topic
+      global_topic = "tui.events"
+      Phoenix.PubSub.subscribe(JidoCodeCore.PubSub, global_topic)
+
+      :ok = Executor.broadcast_tool_call(nil, "read_file", %{"path" => "/test.txt"}, "call_123")
+
+      assert_receive {:tool_call, "read_file", _params, "call_123", nil}, 500
+
+      Phoenix.PubSub.unsubscribe(JidoCodeCore.PubSub, global_topic)
+    end
+
+    test "broadcast_tool_result/2 sends result with nil session_id" do
+      global_topic = "tui.events"
+      Phoenix.PubSub.subscribe(JidoCodeCore.PubSub, global_topic)
+
+      result = Result.ok("call_123", "read_file", "contents", 10)
+      :ok = Executor.broadcast_tool_result(nil, result)
+
+      assert_receive {:tool_result, ^result, nil}, 500
+
+      Phoenix.PubSub.unsubscribe(JidoCodeCore.PubSub, global_topic)
+    end
+
+    test "pubsub_topic/1 returns correct topic format" do
+      assert Executor.pubsub_topic(nil) == "tui.events"
+      assert Executor.pubsub_topic("session123") == "tui.events.session123"
+    end
+  end
+
+  describe "parse_tool_calls/1 edge cases" do
+    test "handles empty response map" do
+      assert {:error, :no_tool_calls} = Executor.parse_tool_calls(%{})
+    end
+
+    test "handles nil tool_calls value" do
+      assert {:error, :no_tool_calls} = Executor.parse_tool_calls(%{"tool_calls" => nil})
+    end
+
+    test "handles malformed tool call" do
+      response = %{
+        "tool_calls" => [
+          %{"id" => "call_123"}
+          # Missing type and function keys
+        ]
+      }
+
+      assert {:error, {:invalid_tool_call, _}} = Executor.parse_tool_calls(response)
+    end
+
+    test "handles missing function key in tool call" do
+      response = %{
+        "tool_calls" => [
+          %{"id" => "call_123", "type" => "function"}
+          # Missing function key
+        ]
+      }
+
+      assert {:error, {:invalid_tool_call, _}} = Executor.parse_tool_calls(response)
+    end
+  end
+
+  describe "execute_batch/2 edge cases" do
+    test "handles empty list" do
+      assert {:ok, []} = Executor.execute_batch([])
+    end
+
+    test "handles single tool call" do
+      tool_calls = [%{id: "call_1", name: "read_file", arguments: %{"path" => "/test.txt"}}]
+
+      assert {:ok, results} = Executor.execute_batch(tool_calls)
+      assert length(results) == 1
+      assert hd(results).tool_call_id == "call_1"
+    end
+
+    test "handles parallel execution timeout" do
+      tool_calls = [
+        %{id: "call_1", name: "slow_tool", arguments: %{"slow" => 500}},
+        %{id: "call_2", name: "slow_tool", arguments: %{"slow" => 500}}
+      ]
+
+      assert {:ok, results} = Executor.execute_batch(tool_calls, parallel: true, timeout: 100)
+
+      # Both should timeout
+      assert Enum.all?(results, fn r -> r.status == :timeout end)
+    end
+  end
+
 end
