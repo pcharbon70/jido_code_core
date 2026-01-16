@@ -270,23 +270,280 @@ defmodule JidoCodeCore.APIToolsTest do
     end
   end
 
-  describe "execute_tool/4" do
-    test "requires valid session_id" do
-      # Note: Actual execution tests require more setup
-      # These tests verify the API structure
-      assert is_function(&APITools.execute_tool/4)
+  describe "execute_tools/3" do
+    test "returns error for invalid session_id type" do
+      assert_raise FunctionClauseError, fn ->
+        APITools.execute_tools(123, [%{name: "read_file", arguments: %{}}])
+      end
     end
 
-    test "requires tool_name string" do
+    test "returns error for invalid tool_calls type" do
+      assert_raise FunctionClauseError, fn ->
+        APITools.execute_tools("session-id", "invalid")
+      end
+    end
+
+    test "accepts empty tool_calls list" do
+      # Empty list should return ok with empty results
+      assert {:ok, []} = APITools.execute_tools("session-id", [])
+    end
+
+    test "accepts valid tool_calls structure" do
+      # Use non-existent tool to test the path
+      tool_calls = [
+        %{name: "nonexistent_tool", arguments: %{}}
+      ]
+
+      # execute_tools returns results with error status for failed tools
+      assert {:ok, results} = APITools.execute_tools("session-id", tool_calls)
+      assert length(results) == 1
+      assert hd(results).status == :error
+    end
+
+    test "adds call_id to tool calls without :id" do
+      # Use non-existent tools
+      tool_calls = [
+        %{name: "nonexistent_tool", arguments: %{}},
+        %{name: "another_nonexistent", arguments: %{}}
+      ]
+
+      assert {:ok, results} = APITools.execute_tools("session-id", tool_calls)
+      assert length(results) == 2
+
+      # Each result should have a call_id
+      Enum.each(results, fn result ->
+        assert is_binary(result.tool_call_id)
+        assert String.starts_with?(result.tool_call_id, "call_")
+      end)
+    end
+
+    test "preserves existing :id in tool_calls" do
+      tool_calls = [
+        %{id: "custom_123", name: "nonexistent_tool", arguments: %{}}
+      ]
+
+      assert {:ok, results} = APITools.execute_tools("session-id", tool_calls)
+      assert hd(results).tool_call_id == "custom_123"
+    end
+
+    test "accepts project_root option" do
+      tool_calls = [
+        %{name: "nonexistent_tool", arguments: %{}}
+      ]
+
+      assert {:ok, results} = APITools.execute_tools(
+        "session-id",
+        tool_calls,
+        project_root: "/tmp/test"
+      )
+      assert length(results) == 1
+    end
+
+    test "accepts timeout option" do
+      tool_calls = [
+        %{name: "nonexistent_tool", arguments: %{}}
+      ]
+
+      assert {:ok, results} = APITools.execute_tools(
+        "session-id",
+        tool_calls,
+        timeout: 5000
+      )
+      assert length(results) == 1
+    end
+  end
+
+  describe "execute_tool/4 error handling" do
+    test "returns error for non-existent tool" do
+      assert {:error, :not_found} =
+               APITools.execute_tool("session-id", "nonexistent_tool", %{})
+    end
+
+    test "returns error for tool_name not a binary" do
       assert_raise FunctionClauseError, fn ->
         APITools.execute_tool("session-id", :invalid, %{})
       end
     end
 
-    test "requires arguments map" do
+    test "returns error for session_id not a binary" do
+      assert_raise FunctionClauseError, fn ->
+        APITools.execute_tool(123, "read_file", %{})
+      end
+    end
+
+    test "returns error for arguments not a map" do
       assert_raise FunctionClauseError, fn ->
         APITools.execute_tool("session-id", "read_file", "invalid")
       end
+    end
+
+    test "accepts custom timeout option" do
+      assert {:error, :not_found} =
+               APITools.execute_tool("session-id", "nonexistent_tool", %{}, timeout: 5000)
+    end
+
+    test "accepts project_root option" do
+      assert {:error, :not_found} =
+               APITools.execute_tool(
+                 "session-id",
+                 "nonexistent_tool",
+                 %{},
+                 project_root: "/tmp/test"
+               )
+    end
+  end
+
+  describe "parse_llm_tool_calls/1 error handling" do
+    test "returns error for non-map input" do
+      assert_raise FunctionClauseError, fn ->
+        APITools.parse_llm_tool_calls("invalid")
+      end
+    end
+
+    test "returns error for tool_calls with missing function key" do
+      response = %{
+        "tool_calls" => [
+          %{"id" => "call_1", "type" => "function"}
+          # Missing "function" key
+        ]
+      }
+
+      assert {:error, _} = APITools.parse_llm_tool_calls(response)
+    end
+
+    test "returns error for tool_calls with invalid JSON arguments" do
+      response = %{
+        "tool_calls" => [
+          %{
+            "id" => "call_1",
+            "type" => "function",
+            "function" => %{
+              "name" => "read_file",
+              "arguments" => "{invalid json}"
+            }
+          }
+        ]
+      }
+
+      assert {:error, _} = APITools.parse_llm_tool_calls(response)
+    end
+
+    test "returns error for tool_calls with missing name in function" do
+      response = %{
+        "tool_calls" => [
+          %{
+            "id" => "call_1",
+            "type" => "function",
+            "function" => %{
+              # Missing "name"
+              "arguments" => "{}"
+            }
+          }
+        ]
+      }
+
+      assert {:error, _} = APITools.parse_llm_tool_calls(response)
+    end
+
+    test "handles tool_calls with nil arguments" do
+      response = %{
+        "tool_calls" => [
+          %{
+            "id" => "call_1",
+            "type" => "function",
+            "function" => %{
+              "name" => "nonexistent_tool",
+              "arguments" => nil
+            }
+          }
+        ]
+      }
+
+      # nil arguments is invalid - should return error
+      assert {:error, _} = APITools.parse_llm_tool_calls(response)
+    end
+
+    test "handles tool_calls with empty object arguments" do
+      response = %{
+        "tool_calls" => [
+          %{
+            "id" => "call_1",
+            "type" => "function",
+            "function" => %{
+              "name" => "nonexistent_tool",
+              "arguments" => "{}"
+            }
+          }
+        ]
+      }
+
+      # Empty JSON object is valid
+      assert {:ok, calls} = APITools.parse_llm_tool_calls(response)
+      assert length(calls) == 1
+      assert hd(calls).arguments == %{}
+    end
+  end
+
+  describe "get_tool_schema/1 error handling" do
+    test "raises for non-binary name" do
+      assert_raise FunctionClauseError, fn ->
+        APITools.get_tool_schema(:invalid)
+      end
+    end
+  end
+
+  describe "tool_registered?/1 error handling" do
+    test "raises for non-binary name" do
+      assert_raise FunctionClauseError, fn ->
+        APITools.tool_registered?(:invalid)
+      end
+    end
+
+    test "returns false for empty string" do
+      refute APITools.tool_registered?("")
+    end
+  end
+
+  describe "tools_for_llm/0 format validation" do
+    test "returns functions with proper schema for LLM consumption" do
+      tools = APITools.tools_for_llm()
+
+      # At minimum should have our test tools
+      assert length(tools) > 0
+
+      Enum.each(tools, fn tool ->
+        assert tool.type == "function"
+
+        assert is_map(tool.function)
+        assert Map.has_key?(tool.function, :name)
+        assert Map.has_key?(tool.function, :description)
+        assert Map.has_key?(tool.function, :parameters)
+
+        # Parameters should be a map with type "object"
+        params = tool.function.parameters
+        assert params.type == "object"
+
+        # Properties is a map, not a list (key-value pairs)
+        assert is_map(params.properties)
+      end)
+    end
+
+    test "all required parameters are marked in schema" do
+      tools = APITools.tools_for_llm()
+
+      Enum.each(tools, fn tool ->
+        params = tool.function.parameters
+
+        # If there are required params, they should be listed
+        if params.required != [] do
+          assert is_list(params.required)
+
+          # All required params should exist in properties (which is a map)
+          Enum.each(params.required, fn required_param ->
+            assert Map.has_key?(params.properties, required_param)
+          end)
+        end
+      end)
     end
   end
 end
