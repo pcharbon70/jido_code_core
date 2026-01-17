@@ -498,4 +498,58 @@ defmodule JidoCodeCore.API.Session do
   def get_todos(session_id) when is_binary(session_id) do
     State.get_todos(session_id)
   end
+
+  @doc """
+  Gets the prompt history for a session.
+
+  Returns the list of prompts the user has entered, in chronological order.
+  This is used for keyboard navigation (up/down arrows) through previous prompts.
+
+  ## Parameters
+
+    - `session_id` - The session's unique ID
+
+  ## Returns
+
+    - `{:ok, prompts}` - List of prompt strings (oldest first)
+    - `{:error, :not_found}` - Session not found
+
+  ## Examples
+
+      {:ok, prompts} = get_prompt_history("session-id")
+      List.last(prompts)
+      # => "previous prompt"
+
+  """
+  @spec get_prompt_history(String.t()) :: {:ok, [String.t()]} | {:error, :not_found}
+  def get_prompt_history(session_id) when is_binary(session_id) do
+    State.get_prompt_history(session_id)
+  end
+
+  @doc """
+  Adds a prompt to the session's prompt history.
+
+  Called when a user submits input to track it for keyboard navigation.
+
+  ## Parameters
+
+    - `session_id` - The session's unique ID
+    - `prompt` - The prompt text to add
+
+  ## Returns
+
+    - `{:ok, updated_history}` - Updated prompt history
+    - `{:error, :not_found}` - Session not found
+
+  ## Examples
+
+      {:ok, history} = add_prompt_to_history("session-id", "my prompt")
+
+  """
+  @spec add_prompt_to_history(String.t(), String.t()) ::
+          {:ok, [String.t()]} | {:error, :not_found}
+  def add_prompt_to_history(session_id, prompt)
+      when is_binary(session_id) and is_binary(prompt) do
+    State.add_to_prompt_history(session_id, prompt)
+  end
 end
