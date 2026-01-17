@@ -47,7 +47,8 @@ defmodule JidoCodeCore.APISessionTest do
         temperature: 0.5
       }
 
-      assert {:ok, session} = APISession.start_session(project_path: System.tmp_dir!(), config: config)
+      assert {:ok, session} =
+               APISession.start_session(project_path: System.tmp_dir!(), config: config)
 
       assert session.config.provider == :anthropic
       assert session.config.model == "claude-3-5-haiku-20241022"
@@ -117,7 +118,8 @@ defmodule JidoCodeCore.APISessionTest do
 
     test "returns sessions sorted by created_at" do
       {:ok, session1} = APISession.start_session(project_path: System.tmp_dir!())
-      Process.sleep(10) # Ensure different timestamps
+      # Ensure different timestamps
+      Process.sleep(10)
 
       tmp_dir2 = Path.join(System.tmp_dir!(), "second_test_#{:rand.uniform(100_000)}")
       File.mkdir_p!(tmp_dir2)
@@ -186,7 +188,10 @@ defmodule JidoCodeCore.APISessionTest do
       {:ok, session} = APISession.start_session(project_path: System.tmp_dir!())
 
       assert {:ok, updated} =
-               APISession.set_session_config(session.id, %{temperature: 0.3, model: "claude-3-5-sonnet-20241022"})
+               APISession.set_session_config(session.id, %{
+                 temperature: 0.3,
+                 model: "claude-3-5-sonnet-20241022"
+               })
 
       assert updated.config.temperature == 0.3
       assert updated.config.model == "claude-3-5-sonnet-20241022"

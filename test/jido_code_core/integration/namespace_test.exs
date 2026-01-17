@@ -41,6 +41,7 @@ defmodule JidoCodeCore.Integration.NamespaceTest do
       # Verify all use the correct namespace
       Enum.each(jido_code_core_modules, fn mod ->
         namespace = mod |> Module.split() |> List.first()
+
         assert namespace == "JidoCodeCore",
                "Module #{mod} has namespace #{namespace}, expected JidoCodeCore"
       end)
@@ -132,12 +133,12 @@ defmodule JidoCodeCore.Integration.NamespaceTest do
         |> Enum.flat_map(fn file ->
           file
           |> File.read!()
-            |> String.split("\n")
-            |> Enum.with_index(1)
-            |> Enum.filter(fn {line, _line_num} ->
-              String.contains?(line, "TermUI") or String.contains?(line, "TermUi")
-            end)
-            |> Enum.map(fn {_line, line_num} -> {Path.relative_to(file, lib_dir), line_num} end)
+          |> String.split("\n")
+          |> Enum.with_index(1)
+          |> Enum.filter(fn {line, _line_num} ->
+            String.contains?(line, "TermUI") or String.contains?(line, "TermUi")
+          end)
+          |> Enum.map(fn {_line, line_num} -> {Path.relative_to(file, lib_dir), line_num} end)
         end)
 
       # JidoCodeCore should NOT reference TermUI

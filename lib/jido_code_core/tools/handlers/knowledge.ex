@@ -335,11 +335,13 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
               if Types.valid_memory_type?(type_atom) do
                 {:ok, type_atom}
               else
-                {:error, "Invalid memory type: #{type_string}. Valid types: #{valid_types_string()}"}
+                {:error,
+                 "Invalid memory type: #{type_string}. Valid types: #{valid_types_string()}"}
               end
 
             {:error, _reason} ->
-              {:error, "Invalid memory type: #{type_string}. Valid types: #{valid_types_string()}"}
+              {:error,
+               "Invalid memory type: #{type_string}. Valid types: #{valid_types_string()}"}
           end
 
         _ ->
@@ -441,7 +443,10 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
     end
 
     defp add_min_confidence(opts, nil), do: Keyword.put(opts, :min_confidence, 0.5)
-    defp add_min_confidence(opts, conf) when is_number(conf), do: Keyword.put(opts, :min_confidence, conf)
+
+    defp add_min_confidence(opts, conf) when is_number(conf),
+      do: Keyword.put(opts, :min_confidence, conf)
+
     defp add_min_confidence(opts, _), do: opts
 
     defp add_include_superseded(opts, true), do: Keyword.put(opts, :include_superseded, true)
@@ -680,11 +685,12 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
         opts = [min_confidence: min_confidence, include_superseded: false]
 
         # Get types to filter by based on category
-        filter_types = Knowledge.resolve_filter_types(
-          Map.get(args, "category"),
-          @category_types,
-          @convention_types
-        )
+        filter_types =
+          Knowledge.resolve_filter_types(
+            Map.get(args, "category"),
+            @category_types,
+            @convention_types
+          )
 
         # Get limit from args
         limit = Map.get(args, "limit", @default_limit)
@@ -963,11 +969,12 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
         opts = [include_superseded: include_superseded]
 
         # Get types to filter by based on decision_type parameter
-        filter_types = Knowledge.resolve_filter_types(
-          Map.get(args, "decision_type"),
-          @type_filter,
-          @decision_types
-        )
+        filter_types =
+          Knowledge.resolve_filter_types(
+            Map.get(args, "decision_type"),
+            @type_filter,
+            @decision_types
+          )
 
         # Include alternative type if requested
         filter_types =
@@ -1285,8 +1292,13 @@ defmodule JidoCodeCore.Tools.Handlers.Knowledge do
       # C1 fix: Accept both "limit" (preferred) and "max_results" (legacy) for compatibility
       limit_value = Map.get(args, "limit") || Map.get(args, "max_results", @default_limit)
       limit = normalize_limit(limit_value)
-      min_confidence = args |> Map.get("min_confidence", @default_min_confidence) |> normalize_confidence()
-      recency_weight = args |> Map.get("recency_weight", @default_recency_weight) |> normalize_weight()
+
+      min_confidence =
+        args |> Map.get("min_confidence", @default_min_confidence) |> normalize_confidence()
+
+      recency_weight =
+        args |> Map.get("recency_weight", @default_recency_weight) |> normalize_weight()
+
       include_superseded = Map.get(args, "include_superseded", false) == true
       include_types = parse_include_types(Map.get(args, "include_types"))
 

@@ -153,8 +153,7 @@ defmodule JidoCodeCore.Tools.Definitions.Shell do
         %{
           name: "args",
           type: :array,
-          description:
-            "Command arguments as array (e.g., ['test', '--trace'])",
+          description: "Command arguments as array (e.g., ['test', '--trace'])",
           required: false
         },
         %{

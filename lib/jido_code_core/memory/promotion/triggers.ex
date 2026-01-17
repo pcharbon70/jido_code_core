@@ -167,7 +167,11 @@ defmodule JidoCodeCore.Memory.Promotion.Triggers do
     )
 
     result = run_promotion(session_id, :memory_limit_reached, opts)
-    emit_trigger_telemetry(session_id, :memory_limit_reached, result, %{current_count: current_count})
+
+    emit_trigger_telemetry(session_id, :memory_limit_reached, result, %{
+      current_count: current_count
+    })
+
     result
   end
 
@@ -295,7 +299,12 @@ defmodule JidoCodeCore.Memory.Promotion.Triggers do
   # Telemetry
   # =============================================================================
 
-  @spec emit_trigger_telemetry(String.t(), atom(), {:ok, non_neg_integer()} | {:error, term()}, map()) :: :ok
+  @spec emit_trigger_telemetry(
+          String.t(),
+          atom(),
+          {:ok, non_neg_integer()} | {:error, term()},
+          map()
+        ) :: :ok
   defp emit_trigger_telemetry(session_id, trigger, result, extra_metadata \\ %{}) do
     {measurements, status} =
       case result do

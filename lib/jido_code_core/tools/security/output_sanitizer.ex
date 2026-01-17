@@ -84,56 +84,56 @@ defmodule JidoCodeCore.Tools.Security.OutputSanitizer do
   # =============================================================================
 
   @sensitive_fields MapSet.new([
-    # Password variations
-    :password,
-    :passwd,
-    :pass,
-    "password",
-    "passwd",
-    "pass",
-    # Secret variations
-    :secret,
-    :secret_key,
-    :secrets,
-    "secret",
-    "secret_key",
-    "secrets",
-    # API key variations
-    :api_key,
-    :apikey,
-    :api_secret,
-    "api_key",
-    "apikey",
-    "api_secret",
-    # Token variations
-    :token,
-    :access_token,
-    :refresh_token,
-    :auth_token,
-    "token",
-    "access_token",
-    "refresh_token",
-    "auth_token",
-    # Auth variations
-    :auth,
-    :authorization,
-    :credentials,
-    :credential,
-    "auth",
-    "authorization",
-    "credentials",
-    "credential",
-    # Private key variations
-    :private_key,
-    :privatekey,
-    "private_key",
-    "privatekey",
-    # AWS specific
-    :aws_secret_access_key,
-    :aws_access_key_id,
-    "aws_secret_access_key",
-    "aws_access_key_id"
-  ])
+                      # Password variations
+                      :password,
+                      :passwd,
+                      :pass,
+                      "password",
+                      "passwd",
+                      "pass",
+                      # Secret variations
+                      :secret,
+                      :secret_key,
+                      :secrets,
+                      "secret",
+                      "secret_key",
+                      "secrets",
+                      # API key variations
+                      :api_key,
+                      :apikey,
+                      :api_secret,
+                      "api_key",
+                      "apikey",
+                      "api_secret",
+                      # Token variations
+                      :token,
+                      :access_token,
+                      :refresh_token,
+                      :auth_token,
+                      "token",
+                      "access_token",
+                      "refresh_token",
+                      "auth_token",
+                      # Auth variations
+                      :auth,
+                      :authorization,
+                      :credentials,
+                      :credential,
+                      "auth",
+                      "authorization",
+                      "credentials",
+                      "credential",
+                      # Private key variations
+                      :private_key,
+                      :privatekey,
+                      "private_key",
+                      "privatekey",
+                      # AWS specific
+                      :aws_secret_access_key,
+                      :aws_access_key_id,
+                      "aws_secret_access_key",
+                      "aws_access_key_id"
+                    ])
 
   @redacted_value "[REDACTED]"
   @default_max_depth 50

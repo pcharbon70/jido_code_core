@@ -429,7 +429,10 @@ defmodule JidoCodeCore.Memory.LongTerm.StoreManager do
 
   @impl true
   def terminate(reason, state) do
-    Logger.info("StoreManager terminating: #{inspect(reason)}, closing #{map_size(state.stores)} stores")
+    Logger.info(
+      "StoreManager terminating: #{inspect(reason)}, closing #{map_size(state.stores)} stores"
+    )
+
     close_all_stores_with_timeout(state.stores)
     :ok
   end
@@ -485,7 +488,10 @@ defmodule JidoCodeCore.Memory.LongTerm.StoreManager do
         finalize_store_open(store, session_id)
 
       {:error, reason} ->
-        Logger.error("Failed to open TripleStore for session #{session_id}: #{inspect(reason, limit: 50)}")
+        Logger.error(
+          "Failed to open TripleStore for session #{session_id}: #{inspect(reason, limit: 50)}"
+        )
+
         {:error, {:store_open_failed, reason}}
     end
   end
@@ -523,7 +529,9 @@ defmodule JidoCodeCore.Memory.LongTerm.StoreManager do
 
   defp close_store(store_ref) do
     case TripleStore.close(store_ref) do
-      :ok -> :ok
+      :ok ->
+        :ok
+
       {:error, reason} ->
         Logger.warning("Error closing TripleStore: #{inspect(reason, limit: 50)}")
         :ok
@@ -556,7 +564,9 @@ defmodule JidoCodeCore.Memory.LongTerm.StoreManager do
     failed = Enum.filter(results, fn {_, result} -> result != {:ok, :ok} end)
 
     if failed != [] do
-      Logger.warning("Some stores failed to close cleanly: #{inspect(Enum.map(failed, &elem(&1, 0)))}")
+      Logger.warning(
+        "Some stores failed to close cleanly: #{inspect(Enum.map(failed, &elem(&1, 0)))}"
+      )
     end
 
     :ok

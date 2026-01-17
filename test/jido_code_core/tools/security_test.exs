@@ -60,6 +60,7 @@ defmodule JidoCodeCore.Tools.SecurityTest do
     test "rejects absolute path similar to project root", %{project_root: root} do
       # Create a path that starts similarly but is different
       similar_root = root <> "_similar"
+
       assert {:error, :path_outside_boundary} =
                Security.validate_path(Path.join(similar_root, "file.ex"), root)
     end
@@ -376,7 +377,11 @@ defmodule JidoCodeCore.Tools.SecurityTest do
     end
 
     test "handles special characters in filename", %{project_root: root} do
-      special_names = ["file with spaces.txt", "file-with-dashes.txt", "file_with_underscores.txt"]
+      special_names = [
+        "file with spaces.txt",
+        "file-with-dashes.txt",
+        "file_with_underscores.txt"
+      ]
 
       Enum.each(special_names, fn name ->
         assert {:ok, resolved} = Security.validate_path(name, root)

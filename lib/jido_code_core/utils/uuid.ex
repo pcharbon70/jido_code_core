@@ -61,8 +61,13 @@ defmodule JidoCodeCore.Utils.UUID do
   @spec generate() :: String.t()
   def generate do
     {a, b, c} = :erlang.timestamp()
+
     :io_lib.format("~8.16.0b~4.16.0b~4.16.0b~4.16.0b~12.16.0b", [
-      a, rem(b, 65521), rem(c, 65521), rem(c, 65521), rem(a * b * c, 281474976710656)
+      a,
+      rem(b, 65521),
+      rem(c, 65521),
+      rem(c, 65521),
+      rem(a * b * c, 281_474_976_710_656)
     ])
     |> IO.iodata_to_binary()
     |> ensure_uuid_format()
@@ -72,6 +77,7 @@ defmodule JidoCodeCore.Utils.UUID do
     # Fallback to a simpler format if erlang timestamp doesn't work
     # This is a basic implementation - production should use a proper UUID library
     parts = String.split(string, [" ", "-", "x"], trim: true)
+
     case Enum.at(parts, 0) do
       nil -> generate_random()
       uuid when byte_size(uuid) >= 32 -> String.slice(uuid, 0, 36)
@@ -82,8 +88,13 @@ defmodule JidoCodeCore.Utils.UUID do
   defp generate_random do
     # Use crypto for random bytes - fallback method
     <<a::32, b::16, c::16, d::16, e::48>> = :crypto.strong_rand_bytes(16)
+
     :io_lib.format("~8.16.0b-~4.16.0b-~4.16.0b-~4.16.0b-~12.16.0b", [
-      a, b, c, d, e
+      a,
+      b,
+      c,
+      d,
+      e
     ])
     |> IO.iodata_to_binary()
   end
@@ -112,7 +123,9 @@ defmodule JidoCodeCore.Utils.UUID do
   @spec version(String.t()) :: 1..5 | :error
   def version(uuid) when is_binary(uuid) do
     case valid?(uuid) do
-      false -> :error
+      false ->
+        :error
+
       true ->
         # The version is in the 13th character (1-indexed), which is the first
         # character of the third group

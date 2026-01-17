@@ -387,7 +387,8 @@ defmodule JidoCodeCore.Tools.Executor do
 
     with {:ok, tool} <- validate_tool_exists(name),
          :ok <- validate_arguments(tool, args),
-         :ok <- run_middleware_checks(tool, args, enriched_context, id, name, session_id, start_time) do
+         :ok <-
+           run_middleware_checks(tool, args, enriched_context, id, name, session_id, start_time) do
       # Broadcast tool call start
       broadcast_tool_call(session_id, name, args, id)
 
@@ -640,17 +641,17 @@ defmodule JidoCodeCore.Tools.Executor do
   # This prevents atom table exhaustion attacks from arbitrary user input.
   # Keys must match the schemas defined in Remember, Recall, and Forget actions.
   @known_memory_action_keys MapSet.new([
-    "content",
-    "type",
-    "confidence",
-    "rationale",
-    "query",
-    "min_confidence",
-    "limit",
-    "memory_id",
-    "reason",
-    "replacement_id"
-  ])
+                              "content",
+                              "type",
+                              "confidence",
+                              "rationale",
+                              "query",
+                              "min_confidence",
+                              "limit",
+                              "memory_id",
+                              "reason",
+                              "replacement_id"
+                            ])
 
   # Convert string keys to atoms for Jido.Action compatibility.
   # JSON-parsed arguments come with string keys, but Jido.Action expects atom keys.

@@ -209,7 +209,7 @@ defmodule JidoCodeCore.KnowledgeGraph.InMemory do
   Will parse entity metadata to extract relationships and build edges.
   """
   @spec build_dependency_graph([JidoCodeCore.KnowledgeGraph.Entity.t()]) ::
-        {:ok, t()} | {:error, :not_implemented}
+          {:ok, t()} | {:error, :not_implemented}
   def build_dependency_graph(_entities) do
     {:error, :not_implemented}
   end
@@ -235,7 +235,7 @@ defmodule JidoCodeCore.KnowledgeGraph.InMemory do
   - `{:error, :not_implemented}` - Not yet implemented
   """
   @spec find_related_entities(t(), term(), keyword()) ::
-        {:ok, [term()]} | {:error, :not_implemented}
+          {:ok, [term()]} | {:error, :not_implemented}
   def find_related_entities(_graph, _entity_id, _opts \\ []) do
     {:error, :not_implemented}
   end
@@ -257,7 +257,7 @@ defmodule JidoCodeCore.KnowledgeGraph.InMemory do
   - `{:error, :not_implemented}` - Not yet implemented
   """
   @spec add_entity(t(), JidoCodeCore.KnowledgeGraph.Entity.t()) ::
-        {:ok, t()} | {:error, :not_implemented}
+          {:ok, t()} | {:error, :not_implemented}
   def add_entity(_graph, _entity) do
     {:error, :not_implemented}
   end
@@ -279,7 +279,7 @@ defmodule JidoCodeCore.KnowledgeGraph.InMemory do
   - `{:error, :not_implemented}` - Not yet implemented
   """
   @spec add_relationship(t(), term(), term(), edge_type()) ::
-        {:ok, t()} | {:error, :invalid_edge_type | :not_implemented}
+          {:ok, t()} | {:error, :invalid_edge_type | :not_implemented}
   def add_relationship(_graph, _from_id, _to_id, _edge_type) do
     {:error, :not_implemented}
   end

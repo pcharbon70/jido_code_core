@@ -1390,11 +1390,13 @@ defmodule JidoCodeCore.Agents.LLMAgent do
   @spec validate_token_budget(term()) :: pos_integer()
   defp validate_token_budget(nil), do: @default_token_budget
 
-  defp validate_token_budget(budget) when is_integer(budget) and budget >= @min_token_budget and budget <= @max_token_budget do
+  defp validate_token_budget(budget)
+       when is_integer(budget) and budget >= @min_token_budget and budget <= @max_token_budget do
     budget
   end
 
-  defp validate_token_budget(budget) when is_integer(budget) and budget > 0 and budget < @min_token_budget do
+  defp validate_token_budget(budget)
+       when is_integer(budget) and budget > 0 and budget < @min_token_budget do
     Logger.warning("Token budget #{budget} is below minimum #{@min_token_budget}, using minimum")
     @min_token_budget
   end
@@ -1405,7 +1407,10 @@ defmodule JidoCodeCore.Agents.LLMAgent do
   end
 
   defp validate_token_budget(budget) do
-    Logger.warning("Invalid token_budget #{inspect(budget)}, using default #{@default_token_budget}")
+    Logger.warning(
+      "Invalid token_budget #{inspect(budget)}, using default #{@default_token_budget}"
+    )
+
     @default_token_budget
   end
 

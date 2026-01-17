@@ -243,9 +243,12 @@ defmodule JidoCodeCore.Memory.ShortTerm.PendingMemoriesTest do
 
       assert length(ready) == 3
       # Sorted by score descending
-      assert Enum.at(ready, 0).id == "agent-1"  # 1.0
-      assert Enum.at(ready, 1).id == "implicit-2"  # 0.9
-      assert Enum.at(ready, 2).id == "implicit-1"  # 0.7
+      # 1.0
+      assert Enum.at(ready, 0).id == "agent-1"
+      # 0.9
+      assert Enum.at(ready, 1).id == "implicit-2"
+      # 0.7
+      assert Enum.at(ready, 2).id == "implicit-1"
     end
 
     test "uses default threshold of 0.6 when not specified" do
@@ -613,7 +616,8 @@ defmodule JidoCodeCore.Memory.ShortTerm.PendingMemoriesTest do
 
       # Check ready for promotion
       ready = PendingMemories.ready_for_promotion(pending, 0.6)
-      assert length(ready) == 2  # high + agent
+      # high + agent
+      assert length(ready) == 2
 
       ids = Enum.map(ready, & &1.id)
       assert "high" in ids
@@ -622,8 +626,10 @@ defmodule JidoCodeCore.Memory.ShortTerm.PendingMemoriesTest do
 
       # Clear promoted items
       pending = PendingMemories.clear_promoted(pending, ["high"])
-      assert map_size(pending.items) == 1  # only "low" remains
-      assert length(pending.agent_decisions) == 0  # all cleared
+      # only "low" remains
+      assert map_size(pending.items) == 1
+      # all cleared
+      assert length(pending.agent_decisions) == 0
     end
 
     test "manages capacity by evicting lowest scored items" do

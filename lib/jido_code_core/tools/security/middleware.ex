@@ -48,7 +48,11 @@ defmodule JidoCodeCore.Tools.Security.Middleware do
   @typedoc """
   Result of middleware checks.
   """
-  @type check_result :: :ok | {:error, {:rate_limited, map()}} | {:error, {:permission_denied, map()}} | {:error, {:consent_required, map()}}
+  @type check_result ::
+          :ok
+          | {:error, {:rate_limited, map()}}
+          | {:error, {:permission_denied, map()}}
+          | {:error, {:consent_required, map()}}
 
   @doc """
   Returns whether security middleware is enabled.

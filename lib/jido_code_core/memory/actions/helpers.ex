@@ -92,7 +92,8 @@ defmodule JidoCodeCore.Memory.Actions.Helpers do
       {:error, :not_a_string}
 
   """
-  @spec validate_non_empty_string(term()) :: {:ok, String.t()} | {:error, :empty_string | :not_a_string}
+  @spec validate_non_empty_string(term()) ::
+          {:ok, String.t()} | {:error, :empty_string | :not_a_string}
   def validate_non_empty_string(value) when is_binary(value) do
     trimmed = String.trim(value)
 
@@ -123,8 +124,10 @@ defmodule JidoCodeCore.Memory.Actions.Helpers do
 
   """
   @spec validate_bounded_string(term(), pos_integer()) ::
-          {:ok, String.t()} | {:error, :empty_string | :not_a_string | {:too_long, pos_integer(), pos_integer()}}
-  def validate_bounded_string(value, max_length) when is_binary(value) and is_integer(max_length) do
+          {:ok, String.t()}
+          | {:error, :empty_string | :not_a_string | {:too_long, pos_integer(), pos_integer()}}
+  def validate_bounded_string(value, max_length)
+      when is_binary(value) and is_integer(max_length) do
     trimmed = String.trim(value)
     size = byte_size(trimmed)
 
@@ -191,7 +194,8 @@ defmodule JidoCodeCore.Memory.Actions.Helpers do
   """
   @spec validate_optional_bounded_string(term(), pos_integer()) ::
           {:ok, String.t() | nil} | {:error, {:too_long, pos_integer(), pos_integer()}}
-  def validate_optional_bounded_string(value, max_length) when is_binary(value) and is_integer(max_length) do
+  def validate_optional_bounded_string(value, max_length)
+      when is_binary(value) and is_integer(max_length) do
     trimmed = String.trim(value)
     size = byte_size(trimmed)
 

@@ -92,8 +92,7 @@ defmodule JidoCodeCore.Tools.Definitions.Elixir do
         %{
           name: "task",
           type: :string,
-          description:
-            "Mix task name to execute (e.g., 'compile', 'test', 'format', 'deps.get')",
+          description: "Mix task name to execute (e.g., 'compile', 'test', 'format', 'deps.get')",
           required: true
         },
         %{
@@ -209,8 +208,7 @@ defmodule JidoCodeCore.Tools.Definitions.Elixir do
         %{
           name: "trace",
           type: :boolean,
-          description:
-            "Enable verbose trace output for each test. Shows test name as it runs.",
+          description: "Enable verbose trace output for each test. Shows test name as it runs.",
           required: false
         },
         %{

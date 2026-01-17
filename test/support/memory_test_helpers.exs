@@ -384,7 +384,8 @@ defmodule JidoCodeCore.TestHelpers.MemoryTestHelpers do
 
       unless actual_value == expected_value do
         raise ExUnit.AssertionError,
-          message: "Expected #{key} to be #{inspect(expected_value)}, got #{inspect(actual_value)}"
+          message:
+            "Expected #{key} to be #{inspect(expected_value)}, got #{inspect(actual_value)}"
       end
     end)
 

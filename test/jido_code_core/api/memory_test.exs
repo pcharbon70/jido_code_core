@@ -32,14 +32,16 @@ defmodule JidoCodeCore.APIMemoryTest do
     project_path = Keyword.get(opts, :project_path, System.tmp_dir!())
     session_id = Keyword.get(opts, :session_id)
 
-    base_session = case session_id do
-      nil ->
-        {:ok, session} = Session.new(project_path: project_path)
-        session
-      id ->
-        {:ok, session} = Session.new(project_path: project_path, id: id)
-        session
-    end
+    base_session =
+      case session_id do
+        nil ->
+          {:ok, session} = Session.new(project_path: project_path)
+          session
+
+        id ->
+          {:ok, session} = Session.new(project_path: project_path, id: id)
+          session
+      end
 
     case SessionSupervisor.start_session(base_session) do
       {:ok, _pid} -> {:ok, base_session}
@@ -100,8 +102,12 @@ defmodule JidoCodeCore.APIMemoryTest do
     test "accepts rationale option" do
       assert {:ok, session} = create_test_session()
 
-      result = APIMemory.remember(session.id, "Decision rationale",
-        type: :decision, rationale: "Performance optimization")
+      result =
+        APIMemory.remember(session.id, "Decision rationale",
+          type: :decision,
+          rationale: "Performance optimization"
+        )
+
       assert is_tuple(result)
 
       SessionSupervisor.stop_session(session.id)
@@ -110,11 +116,13 @@ defmodule JidoCodeCore.APIMemoryTest do
     test "accepts all options together" do
       assert {:ok, session} = create_test_session()
 
-      result = APIMemory.remember(session.id, "Full option memory",
-        type: :convention,
-        confidence: 0.9,
-        rationale: "Important for code consistency"
-      )
+      result =
+        APIMemory.remember(session.id, "Full option memory",
+          type: :convention,
+          confidence: 0.9,
+          rationale: "Important for code consistency"
+        )
+
       assert is_tuple(result)
 
       SessionSupervisor.stop_session(session.id)
@@ -191,13 +199,15 @@ defmodule JidoCodeCore.APIMemoryTest do
     test "accepts all options together" do
       assert {:ok, session} = create_test_session()
 
-      result = APIMemory.recall(session.id,
-        query: "framework",
-        search_mode: :hybrid,
-        type: :fact,
-        min_confidence: 0.6,
-        limit: 10
-      )
+      result =
+        APIMemory.recall(session.id,
+          query: "framework",
+          search_mode: :hybrid,
+          type: :fact,
+          min_confidence: 0.6,
+          limit: 10
+        )
+
       assert is_tuple(result)
 
       SessionSupervisor.stop_session(session.id)

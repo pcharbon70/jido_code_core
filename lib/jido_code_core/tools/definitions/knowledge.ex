@@ -149,8 +149,7 @@ defmodule JidoCodeCore.Tools.Definitions.Knowledge do
         %{
           name: "evidence_refs",
           type: :array,
-          description:
-            "References to supporting evidence (file paths, URLs, or memory IDs)",
+          description: "References to supporting evidence (file paths, URLs, or memory IDs)",
           required: false
         },
         %{

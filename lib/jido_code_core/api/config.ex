@@ -57,9 +57,9 @@ defmodule JidoCodeCore.API.Config do
 
   @typedoc "Settings map structure"
   @type settings :: %{
-    optional(String.t()) =>
-      pos_integer() | String.t() | [String.t()] | %{optional(String.t()) => [String.t()]}
-  }
+          optional(String.t()) =>
+            pos_integer() | String.t() | [String.t()] | %{optional(String.t()) => [String.t()]}
+        }
 
   # ============================================================================
   # Settings Access

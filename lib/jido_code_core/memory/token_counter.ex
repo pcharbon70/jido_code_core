@@ -276,7 +276,8 @@ defmodule JidoCodeCore.Memory.TokenCounter do
 
   """
   @spec select_within_budget(list(), non_neg_integer(), (any() -> non_neg_integer())) :: list()
-  def select_within_budget(items, budget, count_fn) when is_list(items) and is_integer(budget) and budget >= 0 do
+  def select_within_budget(items, budget, count_fn)
+      when is_list(items) and is_integer(budget) and budget >= 0 do
     items
     |> Enum.reduce_while({[], 0}, fn item, {acc, tokens} ->
       item_tokens = count_fn.(item)

@@ -270,9 +270,11 @@ defmodule JidoCodeCore.Memory.ContextBuilder do
       force_summarize: force_summarize
     }
 
-    with {:ok, conversation} <- get_conversation(session_id, conversation_opts, include_conversation),
+    with {:ok, conversation} <-
+           get_conversation(session_id, conversation_opts, include_conversation),
          {:ok, working} <- get_working_context(session_id),
-         {:ok, long_term} <- get_relevant_memories(session_id, query_hint, include_memories, token_budget.long_term) do
+         {:ok, long_term} <-
+           get_relevant_memories(session_id, query_hint, include_memories, token_budget.long_term) do
       context = assemble_context(conversation, working, long_term)
       emit_telemetry(session_id, context.token_counts, start_time)
       {:ok, context}
@@ -533,10 +535,15 @@ defmodule JidoCodeCore.Memory.ContextBuilder do
 
   defp format_key(key), do: to_string(key)
 
-  defp format_value(value) when is_binary(value), do: sanitize_content(value) |> truncate_content()
+  defp format_value(value) when is_binary(value),
+    do: sanitize_content(value) |> truncate_content()
+
   defp format_value(value) when is_atom(value), do: Atom.to_string(value)
   defp format_value(value) when is_number(value), do: to_string(value)
-  defp format_value(value) when is_list(value), do: Enum.join(value, ", ") |> sanitize_content() |> truncate_content()
+
+  defp format_value(value) when is_list(value),
+    do: Enum.join(value, ", ") |> sanitize_content() |> truncate_content()
+
   defp format_value(value), do: inspect(value) |> truncate_content()
 
   defp format_memories(memories) do

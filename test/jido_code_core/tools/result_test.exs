@@ -18,7 +18,8 @@ defmodule JidoCodeCore.Tools.ResultTest do
       assert result.tool_name == "test_tool"
       assert result.status == :ok
       assert result.content == "result"
-      assert result.duration_ms == 0  # default value
+      # default value
+      assert result.duration_ms == 0
     end
   end
 

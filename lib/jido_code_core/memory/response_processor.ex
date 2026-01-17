@@ -76,10 +76,31 @@ defmodule JidoCodeCore.Memory.ResponseProcessor do
 
   # Known programming languages for validation
   @known_languages MapSet.new([
-    "elixir", "erlang", "python", "javascript", "typescript", "ruby", "go",
-    "rust", "java", "kotlin", "swift", "c", "cpp", "csharp", "php", "scala",
-    "haskell", "clojure", "lua", "perl", "r", "julia", "dart", "zig"
-  ])
+                     "elixir",
+                     "erlang",
+                     "python",
+                     "javascript",
+                     "typescript",
+                     "ruby",
+                     "go",
+                     "rust",
+                     "java",
+                     "kotlin",
+                     "swift",
+                     "c",
+                     "cpp",
+                     "csharp",
+                     "php",
+                     "scala",
+                     "haskell",
+                     "clojure",
+                     "lua",
+                     "perl",
+                     "r",
+                     "julia",
+                     "dart",
+                     "zig"
+                   ])
 
   # =============================================================================
   # Public API
@@ -118,7 +139,10 @@ defmodule JidoCodeCore.Memory.ResponseProcessor do
     extractions = extract_context(response)
 
     if map_size(extractions) > 0 do
-      Logger.debug("ResponseProcessor: Extracted #{map_size(extractions)} context items from response")
+      Logger.debug(
+        "ResponseProcessor: Extracted #{map_size(extractions)} context items from response"
+      )
+
       update_working_context(extractions, session_id)
     end
 
@@ -242,11 +266,11 @@ defmodule JidoCodeCore.Memory.ResponseProcessor do
   @spec valid_file_path?(String.t()) :: boolean()
   defp valid_file_path?(path) do
     # Must have an extension and reasonable length
+    # Must not start with common non-file patterns
     String.length(path) >= 3 and
       String.length(path) <= 256 and
       String.contains?(path, ".") and
       not String.contains?(path, " ") and
-      # Must not start with common non-file patterns
       not String.starts_with?(path, "http") and
       not String.starts_with?(path, "www.")
   end
@@ -260,7 +284,9 @@ defmodule JidoCodeCore.Memory.ResponseProcessor do
              confidence: @inferred_confidence
            ) do
         :ok ->
-          Logger.debug("ResponseProcessor: Updated #{key} = #{inspect(value)} for session #{session_id}")
+          Logger.debug(
+            "ResponseProcessor: Updated #{key} = #{inspect(value)} for session #{session_id}"
+          )
 
         {:error, reason} ->
           Logger.warning("ResponseProcessor: Failed to update #{key}: #{inspect(reason)}")

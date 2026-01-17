@@ -87,11 +87,13 @@ defmodule JidoCodeCore.Memory.Actions.HelpersTest do
 
   describe "format_common_error/1" do
     test "formats missing_session_id error" do
-      assert Helpers.format_common_error(:missing_session_id) == "Session ID is required in context"
+      assert Helpers.format_common_error(:missing_session_id) ==
+               "Session ID is required in context"
     end
 
     test "formats invalid_session_id error" do
-      assert Helpers.format_common_error(:invalid_session_id) == "Session ID must be a valid string"
+      assert Helpers.format_common_error(:invalid_session_id) ==
+               "Session ID must be a valid string"
     end
 
     test "returns nil for unrecognized errors" do

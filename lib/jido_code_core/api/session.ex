@@ -62,19 +62,19 @@ defmodule JidoCodeCore.API.Session do
 
   @typedoc "Session creation options"
   @type start_opts :: [
-    project_path: Path.t(),
-    name: String.t() | nil,
-    config: map() | nil,
-    supervisor_module: module() | nil
-  ]
+          project_path: Path.t(),
+          name: String.t() | nil,
+          config: map() | nil,
+          supervisor_module: module() | nil
+        ]
 
   @typedoc "Configuration update options"
   @type config_update :: %{
-    optional(:provider) => atom(),
-    optional(:model) => String.t(),
-    optional(:temperature) => float(),
-    optional(:max_tokens) => pos_integer()
-  }
+          optional(:provider) => atom(),
+          optional(:model) => String.t(),
+          optional(:temperature) => float(),
+          optional(:max_tokens) => pos_integer()
+        }
 
   @typedoc "Language atom or string"
   @type language :: atom() | String.t()

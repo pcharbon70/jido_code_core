@@ -74,7 +74,7 @@ defmodule JidoCodeCore.KnowledgeGraph.GraphRAG do
   - `{:error, :not_implemented}` - Not yet implemented
   """
   @spec query(InMemory.t(), String.t(), query_opts()) ::
-        {:ok, context()} | {:error, :not_implemented}
+          {:ok, context()} | {:error, :not_implemented}
   def query(_graph, _query, _opts \\ []) do
     {:error, :not_implemented}
   end
@@ -98,7 +98,7 @@ defmodule JidoCodeCore.KnowledgeGraph.GraphRAG do
   - `{:error, :not_implemented}` - Not yet implemented
   """
   @spec build_context(InMemory.t(), term(), query_opts()) ::
-        {:ok, context()} | {:error, :entity_not_found | :not_implemented}
+          {:ok, context()} | {:error, :entity_not_found | :not_implemented}
   def build_context(_graph, _entity_id, _opts \\ []) do
     {:error, :not_implemented}
   end
@@ -121,7 +121,7 @@ defmodule JidoCodeCore.KnowledgeGraph.GraphRAG do
   - `{:error, :not_implemented}` - Not yet implemented
   """
   @spec rank_entities([term()], String.t(), InMemory.t()) ::
-        {:ok, [term()]} | {:error, :not_implemented}
+          {:ok, [term()]} | {:error, :not_implemented}
   def rank_entities(_entities, _query, _graph) do
     {:error, :not_implemented}
   end

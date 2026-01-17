@@ -73,7 +73,9 @@ defmodule JidoCodeCore.Memory.Actions.ForgetTest do
       context = %{session_id: "test-session-123"}
 
       # Reason validation passes, fails on memory access (expected without Memory.Supervisor setup)
-      assert {:error, error_msg} = Forget.run(%{memory_id: "mem-123", reason: max_reason}, context)
+      assert {:error, error_msg} =
+               Forget.run(%{memory_id: "mem-123", reason: max_reason}, context)
+
       # Should get a store error, not a reason length error
       refute String.contains?(error_msg, "Reason exceeds maximum length")
     end
@@ -139,7 +141,8 @@ defmodule JidoCodeCore.Memory.Actions.ForgetTest do
       context = %{session_id: "test-session-123"}
 
       # Validates replacement_id format, trims whitespace
-      assert {:error, _} = Forget.run(%{memory_id: "mem-123", replacement_id: "  replacement  "}, context)
+      assert {:error, _} =
+               Forget.run(%{memory_id: "mem-123", replacement_id: "  replacement  "}, context)
     end
   end
 end

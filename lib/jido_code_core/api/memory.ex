@@ -57,8 +57,8 @@ defmodule JidoCodeCore.API.Memory do
   alias JidoCodeCore.Memory.Actions
 
   @typedoc "Memory type atom"
+  # Knowledge types
   @type memory_type ::
-          # Knowledge types
           :fact
           | :assumption
           | :hypothesis
@@ -90,19 +90,19 @@ defmodule JidoCodeCore.API.Memory do
 
   @typedoc "Remember options"
   @type remember_opts :: [
-    type: memory_type(),
-    confidence: float(),
-    rationale: String.t()
-  ]
+          type: memory_type(),
+          confidence: float(),
+          rationale: String.t()
+        ]
 
   @typedoc "Recall options"
   @type recall_opts :: [
-    query: String.t(),
-    search_mode: search_mode(),
-    type: memory_type() | :all,
-    min_confidence: float(),
-    limit: pos_integer()
-  ]
+          query: String.t(),
+          search_mode: search_mode(),
+          type: memory_type() | :all,
+          min_confidence: float(),
+          limit: pos_integer()
+        ]
 
   # ============================================================================
   # Long-term Memory Operations
@@ -141,7 +141,8 @@ defmodule JidoCodeCore.API.Memory do
   """
   @spec remember(String.t(), String.t(), remember_opts()) ::
           {:ok, map()} | {:error, term()}
-  def remember(session_id, content, opts \\ []) when is_binary(session_id) and is_binary(content) do
+  def remember(session_id, content, opts \\ [])
+      when is_binary(session_id) and is_binary(content) do
     type = Keyword.get(opts, :type, :fact)
     confidence = Keyword.get(opts, :confidence, 0.8)
     rationale = Keyword.get(opts, :rationale)

@@ -54,18 +54,18 @@ defmodule JidoCodeCore.API.Tools do
 
   @typedoc "Tool execution options"
   @type execute_opts :: [
-    timeout: pos_integer(),
-    project_root: Path.t()
-  ]
+          timeout: pos_integer(),
+          project_root: Path.t()
+        ]
 
   @typedoc "Tool execution result"
   @type tool_result :: %Result{
-    tool_call_id: String.t(),
-    tool_name: String.t(),
-    status: :ok | :error | :timeout,
-    content: String.t(),
-    duration_ms: non_neg_integer()
-  }
+          tool_call_id: String.t(),
+          tool_name: String.t(),
+          status: :ok | :error | :timeout,
+          content: String.t(),
+          duration_ms: non_neg_integer()
+        }
 
   # ============================================================================
   # Tool Listing and Query
@@ -257,9 +257,10 @@ defmodule JidoCodeCore.API.Tools do
       when is_binary(session_id) and is_list(tool_calls) do
     with {:ok, context} <- build_execution_context(session_id, opts) do
       # Add IDs to tool calls if missing
-      calls = Enum.map(tool_calls, fn call ->
-        Map.put_new(call, :id, generate_call_id())
-      end)
+      calls =
+        Enum.map(tool_calls, fn call ->
+          Map.put_new(call, :id, generate_call_id())
+        end)
 
       Executor.execute_batch(calls, context: context, timeout: Keyword.get(opts, :timeout))
     end
@@ -363,11 +364,12 @@ defmodule JidoCodeCore.API.Tools do
       timeout: timeout
     }
 
-    context = if project_root do
-      Map.put(context, :project_root, project_root)
-    else
-      context
-    end
+    context =
+      if project_root do
+        Map.put(context, :project_root, project_root)
+      else
+        context
+      end
 
     {:ok, context}
   end

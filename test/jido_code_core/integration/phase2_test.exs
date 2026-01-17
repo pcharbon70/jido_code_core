@@ -64,9 +64,11 @@ defmodule JidoCodeCore.Integration.Phase2Test do
   defmodule MockToolHandler do
     def execute(%{"action" => "echo", "msg" => msg}, _context), do: {:ok, "Echo: #{msg}"}
     def execute(%{"action" => "fail"}, _context), do: {:error, "Intentional failure"}
+
     def execute(%{"action" => "large_output"}, _context) do
       {:ok, String.duplicate("x", 1_000_000)}
     end
+
     def execute(_params, _context), do: {:ok, "executed"}
   end
 
@@ -112,9 +114,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       {:ok, _state_pid} = State.start_link(session: session)
 
       # Start the session
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Verify session is running
       assert SessionSupervisor.session_running?(session.id)
@@ -144,21 +147,23 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       project_path = temp_path()
       {:ok, session} = Session.new(project_path: project_path, name: "Tool Test")
 
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Register a test tool with proper parameters
-      tool = Tool.new!(%{
-        name: "test_tool",
-        description: "Test tool for workflow",
-        category: :test,
-        handler: MockToolHandler,
-        parameters: [
-          Param.new!(%{name: "action", type: :string, description: "Action to perform"}),
-          Param.new!(%{name: "msg", type: :string, description: "Message to echo"})
-        ]
-      })
+      tool =
+        Tool.new!(%{
+          name: "test_tool",
+          description: "Test tool for workflow",
+          category: :test,
+          handler: MockToolHandler,
+          parameters: [
+            Param.new!(%{name: "action", type: :string, description: "Action to perform"}),
+            Param.new!(%{name: "msg", type: :string, description: "Message to echo"})
+          ]
+        })
 
       :ok = Registry.register(tool)
 
@@ -169,9 +174,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
         arguments: %{"action" => "echo", "msg" => "hello"}
       }
 
-      assert {:ok, result} = Executor.execute(tool_call,
-        context: %{session_id: session.id, project_root: project_path}
-      )
+      assert {:ok, result} =
+               Executor.execute(tool_call,
+                 context: %{session_id: session.id, project_root: project_path}
+               )
 
       assert result.status == :ok
       assert result.content == "Echo: hello"
@@ -189,9 +195,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       # Start State GenServer
       {:ok, _state_pid} = State.start_link(session: session)
 
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Store a memory via WorkingContext
       context_key = :framework
@@ -210,19 +217,21 @@ defmodule JidoCodeCore.Integration.Phase2Test do
 
     test "2.4.1.4 Multiple sessions run concurrently" do
       # Create multiple sessions
-      sessions = for i <- 1..5 do
-        project_path = temp_path("_#{i}")
-        {:ok, session} = Session.new(project_path: project_path, name: "Session #{i}")
+      sessions =
+        for i <- 1..5 do
+          project_path = temp_path("_#{i}")
+          {:ok, session} = Session.new(project_path: project_path, name: "Session #{i}")
 
-        # Start State GenServer for each session
-        {:ok, _state_pid} = State.start_link(session: session)
+          # Start State GenServer for each session
+          {:ok, _state_pid} = State.start_link(session: session)
 
-        {:ok, _pid} = SessionSupervisor.start_session(session,
-          supervisor_module: SessionSupervisorStub
-        )
+          {:ok, _pid} =
+            SessionSupervisor.start_session(session,
+              supervisor_module: SessionSupervisorStub
+            )
 
-        session
-      end
+          session
+        end
 
       # Verify all sessions are running
       for session <- sessions do
@@ -254,9 +263,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       {:ok, session} = Session.new(project_path: project_path, name: "Crash Test")
       session_id = session.id
 
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Verify session is running
       assert SessionSupervisor.session_running?(session_id)
@@ -325,23 +335,27 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       topic = PubSubTopics.tui_events()
 
       # Create multiple subscriber tasks
-      subscriber1 = Task.async(fn ->
-        PubSub.subscribe(JidoCodeCore.PubSub, topic)
-        receive do
-          {:test_event, "data"} -> :subscriber1_received
-        after
-          1000 -> :subscriber1_timeout
-        end
-      end)
+      subscriber1 =
+        Task.async(fn ->
+          PubSub.subscribe(JidoCodeCore.PubSub, topic)
 
-      subscriber2 = Task.async(fn ->
-        PubSub.subscribe(JidoCodeCore.PubSub, topic)
-        receive do
-          {:test_event, "data"} -> :subscriber2_received
-        after
-          1000 -> :subscriber2_timeout
-        end
-      end)
+          receive do
+            {:test_event, "data"} -> :subscriber1_received
+          after
+            1000 -> :subscriber1_timeout
+          end
+        end)
+
+      subscriber2 =
+        Task.async(fn ->
+          PubSub.subscribe(JidoCodeCore.PubSub, topic)
+
+          receive do
+            {:test_event, "data"} -> :subscriber2_received
+          after
+            1000 -> :subscriber2_timeout
+          end
+        end)
 
       # Give subscribers time to subscribe
       Process.sleep(50)
@@ -391,10 +405,11 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       # This test verifies that project settings can be set per session
       project_path = temp_path()
 
-      {:ok, session} = Session.new(
-        project_path: project_path,
-        config: %{model: "project-specific-model"}
-      )
+      {:ok, session} =
+        Session.new(
+          project_path: project_path,
+          config: %{model: "project-specific-model"}
+        )
 
       # Verify the session has the project-specific config
       assert session.config.model == "project-specific-model"
@@ -407,10 +422,12 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       project_path = temp_path()
 
       # Create a session with invalid temperature (should be normalized or rejected)
-      {:ok, session} = Session.new(
-        project_path: project_path,
-        config: %{temperature: 2.5}  # Invalid temperature > 2.0
-      )
+      {:ok, session} =
+        Session.new(
+          project_path: project_path,
+          # Invalid temperature > 2.0
+          config: %{temperature: 2.5}
+        )
 
       # Session should still be created (temperature may be clamped)
       assert %Session{} = session
@@ -427,9 +444,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       project_path = temp_path()
       {:ok, session} = Session.new(project_path: project_path)
 
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Verify Security module exists for path validation
       # Test by calling the function directly instead of using function_exported?
@@ -459,12 +477,15 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       {:ok, _state1} = State.start_link(session: session1)
       {:ok, _state2} = State.start_link(session: session2)
 
-      {:ok, _pid1} = SessionSupervisor.start_session(session1,
-        supervisor_module: SessionSupervisorStub
-      )
-      {:ok, _pid2} = SessionSupervisor.start_session(session2,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid1} =
+        SessionSupervisor.start_session(session1,
+          supervisor_module: SessionSupervisorStub
+        )
+
+      {:ok, _pid2} =
+        SessionSupervisor.start_session(session2,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Store different values in each session (using valid key)
       :ok = State.update_context(session1.id, :user_intent, "session1_intent")
@@ -507,21 +528,24 @@ defmodule JidoCodeCore.Integration.Phase2Test do
   describe "2.4.5 Performance Integration Tests" do
     test "2.4.5.1 Multiple concurrent sessions (10+)" do
       # Create 10 concurrent sessions
-      sessions = for i <- 1..10 do
-        project_path = temp_path("_#{i}")
-        {:ok, session} = Session.new(project_path: project_path, name: "Perf Test #{i}")
+      sessions =
+        for i <- 1..10 do
+          project_path = temp_path("_#{i}")
+          {:ok, session} = Session.new(project_path: project_path, name: "Perf Test #{i}")
 
-        {:ok, _pid} = SessionSupervisor.start_session(session,
-          supervisor_module: SessionSupervisorStub
-        )
+          {:ok, _pid} =
+            SessionSupervisor.start_session(session,
+              supervisor_module: SessionSupervisorStub
+            )
 
-        session
-      end
+          session
+        end
 
       # Verify all sessions are running
-      running_count = Enum.count(sessions, fn s ->
-        SessionSupervisor.session_running?(s.id)
-      end)
+      running_count =
+        Enum.count(sessions, fn s ->
+          SessionSupervisor.session_running?(s.id)
+        end)
 
       assert running_count == 10
 
@@ -533,15 +557,16 @@ defmodule JidoCodeCore.Integration.Phase2Test do
 
     test "2.4.5.2 Large tool execution (1MB output)" do
       # Register a tool that returns large output
-      tool = Tool.new!(%{
-        name: "large_output_tool",
-        description: "Tool that returns large output",
-        category: :test,
-        handler: MockToolHandler,
-        parameters: [
-          Param.new!(%{name: "action", type: :string, description: "Action"})
-        ]
-      })
+      tool =
+        Tool.new!(%{
+          name: "large_output_tool",
+          description: "Tool that returns large output",
+          category: :test,
+          handler: MockToolHandler,
+          parameters: [
+            Param.new!(%{name: "action", type: :string, description: "Action"})
+          ]
+        })
 
       :ok = Registry.register(tool)
 
@@ -596,9 +621,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       # Start State GenServer
       {:ok, _state_pid} = State.start_link(session: session)
 
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Add 100 messages
       start_time = System.monotonic_time(:millisecond)
@@ -637,9 +663,10 @@ defmodule JidoCodeCore.Integration.Phase2Test do
       # Start State GenServer (normally done by Session.Supervisor)
       {:ok, _state_pid} = State.start_link(session: session)
 
-      {:ok, _pid} = SessionSupervisor.start_session(session,
-        supervisor_module: SessionSupervisorStub
-      )
+      {:ok, _pid} =
+        SessionSupervisor.start_session(session,
+          supervisor_module: SessionSupervisorStub
+        )
 
       # Perform various operations
       for i <- 1..50 do

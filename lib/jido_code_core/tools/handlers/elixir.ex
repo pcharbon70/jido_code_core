@@ -192,7 +192,10 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
   def format_error(:timeout, task), do: "Mix task timed out: #{task}"
   def format_error(:enoent, _task), do: "Mix command not found"
   def format_error(:path_traversal_blocked, _task), do: "Path traversal not allowed in arguments"
-  def format_error({:path_traversal_blocked, arg}, _task), do: "Path traversal not allowed in argument: #{arg}"
+
+  def format_error({:path_traversal_blocked, arg}, _task),
+    do: "Path traversal not allowed in argument: #{arg}"
+
   def format_error(reason, task) when is_atom(reason), do: "Error (#{reason}): mix #{task}"
   def format_error(reason, _task) when is_binary(reason), do: reason
   def format_error(reason, task), do: "Error (#{inspect(reason)}): mix #{task}"
@@ -344,7 +347,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         case Task.yield(task_ref, timeout) || Task.shutdown(task_ref, :brutal_kill) do
           {:ok, {output, exit_code}} ->
             truncated_output = truncate_output(output)
-            ElixirHandler.emit_elixir_telemetry(:mix_task, start_time, task, context, :ok, exit_code)
+
+            ElixirHandler.emit_elixir_telemetry(
+              :mix_task,
+              start_time,
+              task,
+              context,
+              :ok,
+              exit_code
+            )
 
             result = %{
               "output" => truncated_output,
@@ -556,7 +567,8 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
 
     defp add_tag_arg(cmd_args, _), do: cmd_args
 
-    defp add_exclude_tag_arg(cmd_args, %{"exclude_tag" => tag}) when is_binary(tag) and tag != "" do
+    defp add_exclude_tag_arg(cmd_args, %{"exclude_tag" => tag})
+         when is_binary(tag) and tag != "" do
       cmd_args ++ ["--exclude", tag]
     end
 
@@ -590,7 +602,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         case Task.yield(task_ref, timeout) || Task.shutdown(task_ref, :brutal_kill) do
           {:ok, {output, exit_code}} ->
             truncated_output = truncate_output(output)
-            ElixirHandler.emit_elixir_telemetry(:run_exunit, start_time, "test", context, :ok, exit_code)
+
+            ElixirHandler.emit_elixir_telemetry(
+              :run_exunit,
+              start_time,
+              "test",
+              context,
+              :ok,
+              exit_code
+            )
 
             result = %{
               "output" => truncated_output,
@@ -606,7 +626,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
             end
 
           nil ->
-            ElixirHandler.emit_elixir_telemetry(:run_exunit, start_time, "test", context, :timeout, 1)
+            ElixirHandler.emit_elixir_telemetry(
+              :run_exunit,
+              start_time,
+              "test",
+              context,
+              :timeout,
+              1
+            )
+
             {:error, format_error(:timeout)}
         end
       rescue
@@ -666,7 +694,10 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     # Parse timing information from ExUnit output
     # Format: "Finished in 1.2 seconds (0.5s async, 0.7s sync)"
     defp parse_timing(output) do
-      case Regex.run(~r/Finished in ([\d.]+) seconds?(?:\s+\(([\d.]+)s async, ([\d.]+)s sync\))?/, output) do
+      case Regex.run(
+             ~r/Finished in ([\d.]+) seconds?(?:\s+\(([\d.]+)s async, ([\d.]+)s sync\))?/,
+             output
+           ) do
         [_, total] ->
           %{"total_seconds" => parse_float(total)}
 
@@ -762,7 +793,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         get_and_format_state(pid, process_name, timeout, context, start_time)
       else
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:process_state, start_time, process_name, context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :process_state,
+            start_time,
+            process_name,
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -863,7 +902,14 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
             "type" => process_type
           }
 
-          ElixirHandler.emit_elixir_telemetry(:process_state, start_time, process_name, context, :ok, 0)
+          ElixirHandler.emit_elixir_telemetry(
+            :process_state,
+            start_time,
+            process_name,
+            context,
+            :ok,
+            0
+          )
 
           case Jason.encode(result) do
             {:ok, json} -> {:ok, json}
@@ -879,7 +925,14 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
             "error" => "Timeout getting state"
           }
 
-          ElixirHandler.emit_elixir_telemetry(:process_state, start_time, process_name, context, :timeout, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :process_state,
+            start_time,
+            process_name,
+            context,
+            :timeout,
+            1
+          )
 
           case Jason.encode(result) do
             {:ok, json} -> {:ok, json}
@@ -887,13 +940,22 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
           end
 
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:process_state, start_time, process_name, context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :process_state,
+            start_time,
+            process_name,
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
 
     defp get_process_info(pid) do
-      info = Process.info(pid, [:registered_name, :status, :message_queue_len, :memory, :reductions])
+      info =
+        Process.info(pid, [:registered_name, :status, :message_queue_len, :memory, :reductions])
 
       case info do
         nil ->
@@ -958,7 +1020,8 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
           # Binary syntax: password => <<"secret">>
           {~r/(#{field})\s*[=:>]+\s*<<[^>]*>>/i, "\\1 => <<[REDACTED]>>"},
           # Unquoted barewords (identifiers): password => secret_value
-          {~r/(#{field})\s*[=:>]+\s*([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*[=:>\(\[])/i, "\\1 => [REDACTED]"}
+          {~r/(#{field})\s*[=:>]+\s*([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*[=:>\(\[])/i,
+           "\\1 => [REDACTED]"}
         ]
 
         Enum.reduce(patterns, acc, fn {pattern, replacement}, inner_acc ->
@@ -967,7 +1030,9 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
       end)
     end
 
-    defp format_error(:raw_pid_not_allowed), do: "Raw PIDs are not allowed. Use registered process names."
+    defp format_error(:raw_pid_not_allowed),
+      do: "Raw PIDs are not allowed. Use registered process names."
+
     defp format_error(:invalid_process_name), do: "Invalid process name"
     defp format_error(:process_blocked), do: "Access to this process is blocked for security"
     defp format_error(:process_not_found), do: "Process not found or not registered"
@@ -1029,7 +1094,8 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     - `{:error, reason}` - Error message
     """
     @spec execute(map(), map()) :: {:ok, String.t()} | {:error, String.t()}
-    def execute(%{"supervisor" => supervisor_name} = args, context) when is_binary(supervisor_name) do
+    def execute(%{"supervisor" => supervisor_name} = args, context)
+        when is_binary(supervisor_name) do
       start_time = System.monotonic_time(:microsecond)
       depth = get_depth(args)
 
@@ -1039,7 +1105,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         inspect_and_format_tree(pid, supervisor_name, depth, context, start_time)
       else
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:supervisor_tree, start_time, supervisor_name, context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :supervisor_tree,
+            start_time,
+            supervisor_name,
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -1149,7 +1223,14 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
             "truncated" => truncated
           }
 
-          ElixirHandler.emit_elixir_telemetry(:supervisor_tree, start_time, supervisor_name, context, :ok, 0)
+          ElixirHandler.emit_elixir_telemetry(
+            :supervisor_tree,
+            start_time,
+            supervisor_name,
+            context,
+            :ok,
+            0
+          )
 
           case Jason.encode(result) do
             {:ok, json} -> {:ok, json}
@@ -1157,7 +1238,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
           end
 
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:supervisor_tree, start_time, supervisor_name, context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :supervisor_tree,
+            start_time,
+            supervisor_name,
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -1288,12 +1377,20 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
       end)
     end
 
-    defp format_error(:raw_pid_not_allowed), do: "Raw PIDs are not allowed. Use registered supervisor names."
+    defp format_error(:raw_pid_not_allowed),
+      do: "Raw PIDs are not allowed. Use registered supervisor names."
+
     defp format_error(:invalid_supervisor_name), do: "Invalid supervisor name"
-    defp format_error(:supervisor_blocked), do: "Access to this supervisor is blocked for security"
+
+    defp format_error(:supervisor_blocked),
+      do: "Access to this supervisor is blocked for security"
+
     defp format_error(:supervisor_not_found), do: "Supervisor not found or not registered"
     defp format_error(:supervisor_dead), do: "Supervisor is no longer running"
-    defp format_error({:supervisor_error, reason}), do: "Error inspecting supervisor: #{inspect(reason)}"
+
+    defp format_error({:supervisor_error, reason}),
+      do: "Error inspecting supervisor: #{inspect(reason)}"
+
     defp format_error(reason) when is_binary(reason), do: reason
     defp format_error(reason), do: "Error: #{inspect(reason)}"
   end
@@ -1386,11 +1483,21 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
 
       result =
         case operation do
-          "list" -> execute_list(context, start_time)
-          "info" -> execute_info(args, context, start_time)
-          "lookup" -> execute_lookup(args, context, start_time)
-          "sample" -> execute_sample(args, context, start_time)
-          _ -> {:error, "Invalid operation: #{operation}. Must be one of: list, info, lookup, sample"}
+          "list" ->
+            execute_list(context, start_time)
+
+          "info" ->
+            execute_info(args, context, start_time)
+
+          "lookup" ->
+            execute_lookup(args, context, start_time)
+
+          "sample" ->
+            execute_sample(args, context, start_time)
+
+          _ ->
+            {:error,
+             "Invalid operation: #{operation}. Must be one of: list, info, lookup, sample"}
         end
 
       result
@@ -1435,12 +1542,21 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     # Info Operation
     # ============================================================================
 
-    defp execute_info(%{"table" => table_name} = _args, context, start_time) when is_binary(table_name) do
+    defp execute_info(%{"table" => table_name} = _args, context, start_time)
+         when is_binary(table_name) do
       with {:ok, table_ref} <- parse_table_name(table_name),
            :ok <- validate_table_accessible(table_ref) do
         case :ets.info(table_ref) do
           :undefined ->
-            ElixirHandler.emit_elixir_telemetry(:ets_inspect, start_time, "info", context, :error, 1)
+            ElixirHandler.emit_elixir_telemetry(
+              :ets_inspect,
+              start_time,
+              "info",
+              context,
+              :error,
+              1
+            )
+
             {:error, "Table not found: #{table_name}"}
 
           info_list ->
@@ -1461,7 +1577,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         end
       else
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:ets_inspect, start_time, "info", context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :ets_inspect,
+            start_time,
+            "info",
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -1475,7 +1599,11 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     # Lookup Operation
     # ============================================================================
 
-    defp execute_lookup(%{"table" => table_name, "key" => key_string} = _args, context, start_time)
+    defp execute_lookup(
+           %{"table" => table_name, "key" => key_string} = _args,
+           context,
+           start_time
+         )
          when is_binary(table_name) and is_binary(key_string) do
       with {:ok, table_ref} <- parse_table_name(table_name),
            :ok <- validate_table_accessible(table_ref),
@@ -1506,7 +1634,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         end
       else
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:ets_inspect, start_time, "lookup", context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :ets_inspect,
+            start_time,
+            "lookup",
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -1525,7 +1661,8 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     # Sample Operation
     # ============================================================================
 
-    defp execute_sample(%{"table" => table_name} = args, context, start_time) when is_binary(table_name) do
+    defp execute_sample(%{"table" => table_name} = args, context, start_time)
+         when is_binary(table_name) do
       limit = get_limit(args)
 
       with {:ok, table_ref} <- parse_table_name(table_name),
@@ -1558,7 +1695,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         end
       else
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:ets_inspect, start_time, "sample", context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :ets_inspect,
+            start_time,
+            "sample",
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -1620,6 +1765,7 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         :protected ->
           # Protected tables can only be read by owner - check if we own it
           owner = :ets.info(table_ref, :owner)
+
           if owner == self() do
             :ok
           else
@@ -1638,7 +1784,7 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     defp is_project_table?(table_ref) do
       # Only allow named tables (atoms), not reference-based tables
       is_atom(table_ref) and
-        not (table_ref in @blocked_tables) and
+        table_ref not in @blocked_tables and
         not is_owner_blocked?(table_ref)
     end
 
@@ -1772,11 +1918,16 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
       end
     end
 
-    @spec collect_entries(atom(), term(), non_neg_integer(), [term()], non_neg_integer()) :: [term()]
-    defp collect_entries(_table_ref, :"$end_of_table", _remaining, acc, _total_size), do: Enum.reverse(acc)
+    @spec collect_entries(atom(), term(), non_neg_integer(), [term()], non_neg_integer()) :: [
+            term()
+          ]
+    defp collect_entries(_table_ref, :"$end_of_table", _remaining, acc, _total_size),
+      do: Enum.reverse(acc)
+
     defp collect_entries(_table_ref, _key, 0, acc, _total_size), do: Enum.reverse(acc)
     # Stop if we've collected too much data (memory limit)
-    defp collect_entries(_table_ref, _key, _remaining, acc, total_size) when total_size > @max_entry_size do
+    defp collect_entries(_table_ref, _key, _remaining, acc, total_size)
+         when total_size > @max_entry_size do
       Enum.reverse(acc)
     end
 
@@ -1824,7 +1975,8 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
           # Binary syntax: password => <<"secret">>
           {~r/(#{field})\s*[=:>]+\s*<<[^>]*>>/i, "\\1 => <<[REDACTED]>>"},
           # Unquoted barewords (identifiers): password => secret_value
-          {~r/(#{field})\s*[=:>]+\s*([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*[=:>\(\[])/i, "\\1 => [REDACTED]"}
+          {~r/(#{field})\s*[=:>]+\s*([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*[=:>\(\[])/i,
+           "\\1 => [REDACTED]"}
         ]
 
         Enum.reduce(patterns, acc, fn {pattern, replacement}, inner_acc ->
@@ -1837,10 +1989,18 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     defp format_error(:table_not_found), do: "Table not found"
     defp format_error(:table_blocked), do: "Access to this table is blocked for security"
     defp format_error(:table_private), do: "Table is private and cannot be read"
-    defp format_error(:table_protected_not_owner), do: "Table is protected and can only be read by its owner process"
-    defp format_error(:reference_tables_not_supported), do: "Reference-based tables are not supported"
+
+    defp format_error(:table_protected_not_owner),
+      do: "Table is protected and can only be read by its owner process"
+
+    defp format_error(:reference_tables_not_supported),
+      do: "Reference-based tables are not supported"
+
     defp format_error(:invalid_key), do: "Invalid key format"
-    defp format_error(:atom_not_found), do: "Atom key does not exist (only existing atoms are allowed)"
+
+    defp format_error(:atom_not_found),
+      do: "Atom key does not exist (only existing atoms are allowed)"
+
     defp format_error(reason) when is_binary(reason), do: reason
     defp format_error(reason), do: "Error: #{inspect(reason)}"
   end
@@ -1910,7 +2070,10 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         include_callbacks = Map.get(args, "include_callbacks", false)
 
         moduledoc = extract_moduledoc(docs_chunk)
-        function_docs = extract_function_docs(docs_chunk, function_filter, arity_filter, include_callbacks)
+
+        function_docs =
+          extract_function_docs(docs_chunk, function_filter, arity_filter, include_callbacks)
+
         specs = fetch_specs(module, function_filter, arity_filter)
 
         result = %{
@@ -1928,7 +2091,15 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
         end
       else
         {:error, reason} ->
-          ElixirHandler.emit_elixir_telemetry(:fetch_docs, start_time, module_name, context, :error, 1)
+          ElixirHandler.emit_elixir_telemetry(
+            :fetch_docs,
+            start_time,
+            module_name,
+            context,
+            :error,
+            1
+          )
+
           {:error, format_error(reason)}
       end
     end
@@ -2028,7 +2199,12 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
     # Extract function documentation, optionally filtered by function name and arity.
     # When include_callbacks is true, also includes callback documentation for behaviours.
     @spec extract_function_docs(tuple(), String.t() | nil, integer() | nil, boolean()) :: [map()]
-    defp extract_function_docs({:docs_v1, _, _, _, _, _, docs}, function_filter, arity_filter, include_callbacks) do
+    defp extract_function_docs(
+           {:docs_v1, _, _, _, _, _, docs},
+           function_filter,
+           arity_filter,
+           include_callbacks
+         ) do
       docs
       |> Enum.filter(fn
         {{kind, _name, _arity}, _, _, _, _} ->
@@ -2126,7 +2302,9 @@ defmodule JidoCodeCore.Tools.Handlers.Elixir do
 
     # Format error messages
     @spec format_error(atom() | String.t()) :: String.t()
-    defp format_error(:module_not_found), do: "Module not found (only existing modules can be queried)"
+    defp format_error(:module_not_found),
+      do: "Module not found (only existing modules can be queried)"
+
     defp format_error(:module_not_loaded), do: "Module exists but is not loaded"
     defp format_error(:no_docs), do: "Module has no embedded documentation"
     defp format_error(:invalid_beam_file), do: "Module has a corrupted or invalid BEAM file"

@@ -162,10 +162,11 @@ defmodule JidoCodeCore.Memory.Promotion.Engine do
     context_candidates = build_context_candidates(state.working_context, state.access_log)
 
     # Get pending items ready for promotion
-    pending_ready = PendingMemories.ready_for_promotion(
-      state.pending_memories,
-      threshold
-    )
+    pending_ready =
+      PendingMemories.ready_for_promotion(
+        state.pending_memories,
+        threshold
+      )
 
     # Convert pending items to promotion candidates
     pending_candidates = Enum.map(pending_ready, &pending_to_candidate/1)

@@ -40,7 +40,12 @@ defmodule JidoCodeCore.APIToolsTest do
       description: "Searches file contents",
       handler: GrepHandler,
       parameters: [
-        Param.new!(%{name: "pattern", type: :string, description: "Search pattern", required: true}),
+        Param.new!(%{
+          name: "pattern",
+          type: :string,
+          description: "Search pattern",
+          required: true
+        }),
         Param.new!(%{name: "path", type: :string, description: "File path", required: true})
       ]
     })
@@ -331,11 +336,13 @@ defmodule JidoCodeCore.APIToolsTest do
         %{name: "nonexistent_tool", arguments: %{}}
       ]
 
-      assert {:ok, results} = APITools.execute_tools(
-        "session-id",
-        tool_calls,
-        project_root: "/tmp/test"
-      )
+      assert {:ok, results} =
+               APITools.execute_tools(
+                 "session-id",
+                 tool_calls,
+                 project_root: "/tmp/test"
+               )
+
       assert length(results) == 1
     end
 
@@ -344,11 +351,13 @@ defmodule JidoCodeCore.APIToolsTest do
         %{name: "nonexistent_tool", arguments: %{}}
       ]
 
-      assert {:ok, results} = APITools.execute_tools(
-        "session-id",
-        tool_calls,
-        timeout: 5000
-      )
+      assert {:ok, results} =
+               APITools.execute_tools(
+                 "session-id",
+                 tool_calls,
+                 timeout: 5000
+               )
+
       assert length(results) == 1
     end
   end

@@ -1901,9 +1901,7 @@ defmodule JidoCodeCore.Session.State do
       # Run promotion engine
       case PromotionEngine.run_with_state(promotion_state, state.session_id, []) do
         {:ok, count, promoted_ids} when count > 0 ->
-          Logger.debug(
-            "Session.State #{state.session_id} promoted #{count} memories"
-          )
+          Logger.debug("Session.State #{state.session_id} promoted #{count} memories")
 
           # Clear promoted items from pending memories
           updated_pending = PendingMemories.clear_promoted(state.pending_memories, promoted_ids)
@@ -1937,9 +1935,7 @@ defmodule JidoCodeCore.Session.State do
           {:noreply, new_state}
 
         {:error, reason} ->
-          Logger.warning(
-            "Session.State #{state.session_id} promotion failed: #{inspect(reason)}"
-          )
+          Logger.warning("Session.State #{state.session_id} promotion failed: #{inspect(reason)}")
 
           # Reschedule despite error
           new_state = schedule_promotion(state)

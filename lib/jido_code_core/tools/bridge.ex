@@ -898,7 +898,8 @@ defmodule JidoCodeCore.Tools.Bridge do
     {:ok, subcommand, [], %{}}
   end
 
-  defp parse_git_args([subcommand, args_table]) when is_binary(subcommand) and is_list(args_table) do
+  defp parse_git_args([subcommand, args_table])
+       when is_binary(subcommand) and is_list(args_table) do
     cmd_args = decode_args_table(args_table)
     {:ok, subcommand, cmd_args, %{}}
   end

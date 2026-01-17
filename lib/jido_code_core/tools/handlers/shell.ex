@@ -437,7 +437,9 @@ defmodule JidoCodeCore.Tools.Handlers.Shell do
       {:error, "bash_background requires a command argument"}
     end
 
-    defp get_session_id(%{session_id: session_id}) when is_binary(session_id), do: {:ok, session_id}
+    defp get_session_id(%{session_id: session_id}) when is_binary(session_id),
+      do: {:ok, session_id}
+
     defp get_session_id(_), do: {:error, :no_session_id}
 
     defp parse_args(args) when is_list(args), do: Enum.map(args, &to_string/1)
@@ -485,13 +487,21 @@ defmodule JidoCodeCore.Tools.Handlers.Shell do
 
       case BackgroundShell.get_output(shell_id, opts) do
         {:ok, result} ->
-          Shell.emit_shell_telemetry(:bash_output, start_time, shell_id, context, :ok, result.exit_code || 0)
+          Shell.emit_shell_telemetry(
+            :bash_output,
+            start_time,
+            shell_id,
+            context,
+            :ok,
+            result.exit_code || 0
+          )
 
-          {:ok, Jason.encode!(%{
-            output: result.output,
-            status: to_string(result.status),
-            exit_code: result.exit_code
-          })}
+          {:ok,
+           Jason.encode!(%{
+             output: result.output,
+             status: to_string(result.status),
+             exit_code: result.exit_code
+           })}
 
         {:error, :not_found} ->
           Shell.emit_shell_telemetry(:bash_output, start_time, shell_id, context, :error, -1)

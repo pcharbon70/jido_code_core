@@ -59,7 +59,8 @@ defmodule JidoCodeCore.ErrorFormatterTest do
     end
 
     test "handles tuple with lua_error and binary error" do
-      assert ErrorFormatter.format({:lua_error, "syntax error", ["stack trace"]}) == "syntax error"
+      assert ErrorFormatter.format({:lua_error, "syntax error", ["stack trace"]}) ==
+               "syntax error"
     end
   end
 

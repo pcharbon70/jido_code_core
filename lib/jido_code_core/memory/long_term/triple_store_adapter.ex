@@ -375,7 +375,9 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
       {:error, :not_found} ->
         # Already deleted or doesn't exist - success
         :ok
-      {:error, reason} -> {:error, reason}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -493,6 +495,7 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
   @spec query_related(store_ref(), String.t(), String.t(), atom(), keyword()) ::
           {:ok, [stored_memory()]} | {:error, term()}
   def query_related(store, session_id, memory_id, relationship, opts \\ [])
+
   def query_related(store, session_id, memory_id, relationship, opts)
       when is_reference(store) and is_binary(session_id) and is_binary(memory_id) and
              is_atom(relationship) and is_list(opts) do
@@ -622,8 +625,6 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
       )
 
   """
-  @spec query_related(store_ref(), String.t(), String.t(), relationship(), keyword()) ::
-          {:ok, [stored_memory()]} | {:error, term()}
   def query_related(store, session_id, start_memory_id, relationship, opts)
       when relationship in @relationship_types do
     depth = opts |> Keyword.get(:depth, 1) |> min(5) |> max(1)
@@ -633,16 +634,18 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
     with_ets_store(store, fn ->
       case query_by_id(store, session_id, start_memory_id) do
         {:ok, start_memory} ->
-          results = traverse_relationship(
-            store,
-            session_id,
-            start_memory,
-            relationship,
-            depth,
-            limit,
-            include_superseded,
-            MapSet.new([start_memory_id])
-          )
+          results =
+            traverse_relationship(
+              store,
+              session_id,
+              start_memory,
+              relationship,
+              depth,
+              limit,
+              include_superseded,
+              MapSet.new([start_memory_id])
+            )
+
           {:ok, results}
 
         {:error, :not_found} ->
@@ -656,7 +659,16 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
     []
   end
 
-  defp traverse_relationship(store, session_id, memory, relationship, depth, limit, include_superseded, visited) do
+  defp traverse_relationship(
+         store,
+         session_id,
+         memory,
+         relationship,
+         depth,
+         limit,
+         include_superseded,
+         visited
+       ) do
     # Find directly related memories
     related_ids = find_related_ids(store, session_id, memory, relationship, include_superseded)
 
@@ -680,8 +692,14 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
         current_level
         |> Enum.flat_map(fn mem ->
           traverse_relationship(
-            store, session_id, mem, relationship,
-            depth - 1, limit, include_superseded, new_visited
+            store,
+            session_id,
+            mem,
+            relationship,
+            depth - 1,
+            limit,
+            include_superseded,
+            new_visited
           )
         end)
 
@@ -788,7 +806,6 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
       #    }}
 
   """
-  @spec get_stats(store_ref(), String.t()) :: {:ok, map()} | {:error, term()}
   def get_stats(store, session_id) do
     with_ets_store(store, fn ->
       all_records =
@@ -916,7 +933,9 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
       scored =
         records
         |> Enum.map(fn record ->
-          score = calculate_relevance_score(record, context_words, max_access, now, recency_weight)
+          score =
+            calculate_relevance_score(record, context_words, max_access, now, recency_weight)
+
           memory = to_stored_memory(record)
           {memory, score}
         end)
@@ -964,14 +983,72 @@ defmodule JidoCodeCore.Memory.LongTerm.TripleStoreAdapter do
 
   # S5: Common stop words to filter out for better similarity scores
   @stop_words MapSet.new([
-    "the", "is", "at", "which", "on", "a", "an", "and", "or", "but",
-    "in", "to", "of", "for", "with", "as", "by", "be", "it", "that",
-    "this", "was", "are", "been", "have", "has", "had", "will", "would",
-    "could", "should", "may", "might", "can", "do", "does", "did", "not",
-    "no", "yes", "so", "if", "then", "else", "when", "where", "what",
-    "who", "how", "why", "all", "each", "every", "some", "any", "most",
-    "other", "into", "over", "such", "up", "down", "out", "about", "from"
-  ])
+                "the",
+                "is",
+                "at",
+                "which",
+                "on",
+                "a",
+                "an",
+                "and",
+                "or",
+                "but",
+                "in",
+                "to",
+                "of",
+                "for",
+                "with",
+                "as",
+                "by",
+                "be",
+                "it",
+                "that",
+                "this",
+                "was",
+                "are",
+                "been",
+                "have",
+                "has",
+                "had",
+                "will",
+                "would",
+                "could",
+                "should",
+                "may",
+                "might",
+                "can",
+                "do",
+                "does",
+                "did",
+                "not",
+                "no",
+                "yes",
+                "so",
+                "if",
+                "then",
+                "else",
+                "when",
+                "where",
+                "what",
+                "who",
+                "how",
+                "why",
+                "all",
+                "each",
+                "every",
+                "some",
+                "any",
+                "most",
+                "other",
+                "into",
+                "over",
+                "such",
+                "up",
+                "down",
+                "out",
+                "about",
+                "from"
+              ])
 
   # S6: Maximum number of words to extract (prevents memory pressure)
   @max_word_count 500

@@ -377,8 +377,25 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "adds multiple pending memories", %{session_id: session_id} do
-      mem1 = %{id: "mem-1", content: "Fact 1", memory_type: :fact, confidence: 0.8, source_type: :tool, importance_score: 0.9, created_at: DateTime.utc_now()}
-      mem2 = %{id: "mem-2", content: "Fact 2", memory_type: :fact, confidence: 0.7, source_type: :tool, importance_score: 0.8, created_at: DateTime.utc_now()}
+      mem1 = %{
+        id: "mem-1",
+        content: "Fact 1",
+        memory_type: :fact,
+        confidence: 0.8,
+        source_type: :tool,
+        importance_score: 0.9,
+        created_at: DateTime.utc_now()
+      }
+
+      mem2 = %{
+        id: "mem-2",
+        content: "Fact 2",
+        memory_type: :fact,
+        confidence: 0.7,
+        source_type: :tool,
+        importance_score: 0.8,
+        created_at: DateTime.utc_now()
+      }
 
       State.add_pending_memory(session_id, mem1)
       State.add_pending_memory(session_id, mem2)
@@ -388,8 +405,25 @@ defmodule JidoCodeCore.SessionStateTest do
     end
 
     test "clears promoted memories", %{session_id: session_id} do
-      mem1 = %{id: "mem-1", content: "Fact 1", memory_type: :fact, confidence: 0.8, source_type: :tool, importance_score: 0.9, created_at: DateTime.utc_now()}
-      mem2 = %{id: "mem-2", content: "Fact 2", memory_type: :fact, confidence: 0.7, source_type: :tool, importance_score: 0.8, created_at: DateTime.utc_now()}
+      mem1 = %{
+        id: "mem-1",
+        content: "Fact 1",
+        memory_type: :fact,
+        confidence: 0.8,
+        source_type: :tool,
+        importance_score: 0.9,
+        created_at: DateTime.utc_now()
+      }
+
+      mem2 = %{
+        id: "mem-2",
+        content: "Fact 2",
+        memory_type: :fact,
+        confidence: 0.7,
+        source_type: :tool,
+        importance_score: 0.8,
+        created_at: DateTime.utc_now()
+      }
 
       State.add_pending_memory(session_id, mem1)
       State.add_pending_memory(session_id, mem2)

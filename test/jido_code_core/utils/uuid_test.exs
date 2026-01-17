@@ -31,11 +31,16 @@ defmodule JidoCodeCore.Utils.UUIDTest do
     test "returns false for invalid UUID strings" do
       invalid_uuids = [
         "not-a-uuid",
-        "550e8400-e29b-41d4-a716",  # Too short
-        "550e8400-e29b-41d4-a716-446655440000-extra",  # Too long
-        "550e8400-e29b-41d4-a716-44665544000g",  # Invalid character 'g'
-        "g50e8400-e29b-41d4-a716-446655440000",  # Invalid character 'g'
-        "",  # Empty string
+        # Too short
+        "550e8400-e29b-41d4-a716",
+        # Too long
+        "550e8400-e29b-41d4-a716-446655440000-extra",
+        # Invalid character 'g'
+        "550e8400-e29b-41d4-a716-44665544000g",
+        # Invalid character 'g'
+        "g50e8400-e29b-41d4-a716-446655440000",
+        # Empty string
+        "",
         "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
       ]
 

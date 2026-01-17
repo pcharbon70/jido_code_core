@@ -46,16 +46,16 @@ defmodule JidoCodeCore.Integration.DependencyTest do
               String.contains?(line, "alias TermUI") or
               String.contains?(line, "alias TermUi")
           end)
-          |> Enum.map(fn {line, line_num} -> {Path.relative_to(file, lib_dir), line_num, line} end)
+          |> Enum.map(fn {line, line_num} ->
+            {Path.relative_to(file, lib_dir), line_num, line}
+          end)
         end)
 
       # Should have no TUI imports
       assert length(tui_imports) == 0,
              """
              Found #{length(tui_imports)} TUI imports in JidoCodeCore:
-             #{Enum.map_join(tui_imports, "\n", fn {file, line_num, line} ->
-               "  #{file}:#{line_num}: #{String.trim(line)}"
-             end)}
+             #{Enum.map_join(tui_imports, "\n", fn {file, line_num, line} -> "  #{file}:#{line_num}: #{String.trim(line)}" end)}
              JidoCodeCore must not import TUI modules.
              """
     end

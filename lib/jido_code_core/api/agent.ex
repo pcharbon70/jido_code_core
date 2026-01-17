@@ -55,17 +55,17 @@ defmodule JidoCodeCore.API.Agent do
 
   @typedoc "Message options"
   @type message_opts :: [
-    timeout: pos_integer(),
-    system_prompt: String.t() | nil
-  ]
+          timeout: pos_integer(),
+          system_prompt: String.t() | nil
+        ]
 
   @typedoc "Agent status"
   @type agent_status :: %{
-    ready: boolean(),
-    config: map(),
-    session_id: String.t() | nil,
-    topic: String.t() | nil
-  }
+          ready: boolean(),
+          config: map(),
+          session_id: String.t() | nil,
+          topic: String.t() | nil
+        }
 
   # ============================================================================
   # Message Sending

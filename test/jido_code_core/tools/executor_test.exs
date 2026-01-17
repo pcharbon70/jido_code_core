@@ -445,7 +445,13 @@ defmodule JidoCodeCore.Tools.ExecutorTest do
     test "broadcasts tool call event" do
       # This just verifies the function doesn't crash
       # Actual PubSub delivery would require subscription setup
-      assert :ok = Executor.broadcast_tool_call("session123", "read_file", %{"path" => "/test.txt"}, "call_123")
+      assert :ok =
+               Executor.broadcast_tool_call(
+                 "session123",
+                 "read_file",
+                 %{"path" => "/test.txt"},
+                 "call_123"
+               )
     end
 
     test "broadcasts with nil session_id" do
@@ -755,6 +761,7 @@ defmodule JidoCodeCore.Tools.ExecutorTest do
   describe "enrich_context/1 with Session.Manager integration" do
     test "returns error when session_id is missing" do
       assert {:error, :missing_session_id} = Executor.enrich_context(%{})
+
       assert {:error, :missing_session_id} =
                Executor.enrich_context(%{project_root: "/path"})
     end
@@ -886,5 +893,4 @@ defmodule JidoCodeCore.Tools.ExecutorTest do
       assert Enum.all?(results, fn r -> r.status == :timeout end)
     end
   end
-
 end

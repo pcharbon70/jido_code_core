@@ -51,7 +51,8 @@ defmodule JidoCodeCore.TUIDecouplingTest do
       # All error returns should be plain string tuples, not TUI-formatted
       assert {:error, msg} = Settings.validate(%{"invalid_key" => "value"})
       assert is_binary(msg)
-      refute String.contains?(msg, "```")  # No markdown code blocks
+      # No markdown code blocks
+      refute String.contains?(msg, "```")
     end
 
     test "settings file errors are plain strings" do

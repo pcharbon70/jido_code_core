@@ -110,8 +110,8 @@ defmodule JidoCodeCore.Memory.Types do
   - `:root_cause` - Underlying causes of errors
   - `:lesson_learned` - Insights gained from past experiences
   """
+  # Knowledge types
   @type memory_type ::
-          # Knowledge types
           :fact
           | :assumption
           | :hypothesis
@@ -408,10 +408,22 @@ defmodule JidoCodeCore.Memory.Types do
   @knowledge_types [:fact, :assumption, :hypothesis, :discovery, :risk, :unknown]
 
   # Decision types from jido-decision.ttl
-  @decision_types [:decision, :architectural_decision, :implementation_decision, :alternative, :trade_off]
+  @decision_types [
+    :decision,
+    :architectural_decision,
+    :implementation_decision,
+    :alternative,
+    :trade_off
+  ]
 
   # Convention types from jido-convention.ttl
-  @convention_types [:convention, :coding_standard, :architectural_convention, :agent_rule, :process_convention]
+  @convention_types [
+    :convention,
+    :coding_standard,
+    :architectural_convention,
+    :agent_rule,
+    :process_convention
+  ]
 
   # Error types from jido-error.ttl
   @error_types [:error, :bug, :failure, :incident, :root_cause, :lesson_learned]

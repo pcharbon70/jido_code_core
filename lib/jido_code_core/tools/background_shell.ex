@@ -262,6 +262,7 @@ defmodule JidoCodeCore.Tools.BackgroundShell do
     case :ets.whereis(name) do
       :undefined ->
         :ets.new(name, [:named_table, :public, :set])
+
       _ref ->
         :ok
     end

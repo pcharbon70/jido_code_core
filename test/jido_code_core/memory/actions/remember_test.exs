@@ -82,9 +82,14 @@ defmodule JidoCodeCore.Memory.Actions.RememberTest do
     test "returns error when content is not a string" do
       context = %{session_id: "test-session-123"}
 
-      assert {:error, "Content must be a non-empty string"} = Remember.run(%{content: 123}, context)
-      assert {:error, "Content must be a non-empty string"} = Remember.run(%{content: nil}, context)
-      assert {:error, "Content must be a non-empty string"} = Remember.run(%{content: [:list]}, context)
+      assert {:error, "Content must be a non-empty string"} =
+               Remember.run(%{content: 123}, context)
+
+      assert {:error, "Content must be a non-empty string"} =
+               Remember.run(%{content: nil}, context)
+
+      assert {:error, "Content must be a non-empty string"} =
+               Remember.run(%{content: [:list]}, context)
     end
 
     test "returns error when content exceeds maximum length" do
@@ -218,7 +223,8 @@ defmodule JidoCodeCore.Memory.Actions.RememberTest do
       context = %{session_id: "test-session-123"}
 
       # Rationale is optional, passes validation, fails on memory persistence
-      assert {:error, _} = Remember.run(%{content: "Test", rationale: "Important for future"}, context)
+      assert {:error, _} =
+               Remember.run(%{content: "Test", rationale: "Important for future"}, context)
     end
 
     test "accepts nil rationale" do
