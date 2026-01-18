@@ -23,8 +23,8 @@ defmodule JidoCodeCore.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # Agent framework
-      {:jido, "~> 1.2", path: "../jido"},
+      # Agent framework (Jido 2.0)
+      {:jido, "~> 2.0", path: "../jido"},
       {:jido_ai, "~> 2.0", path: "../jido_ai"},
 
       # Communication
