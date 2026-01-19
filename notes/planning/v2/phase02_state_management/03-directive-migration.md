@@ -176,7 +176,7 @@ rm -f test/jido_code_core/agent/directive_builders_test.exs
 1. **Agent**: CodeSessionAgent compiles and runs
 2. **StateOps**: State mutations use StateOp patterns
 3. **Directives**: Side effects use Directive.Emit
-4. **Compatibility**: Existing Session.State tests pass
+4. **Tests**: All tests pass
 5. **Performance**: No performance regression
 
 Proceed to [Phase 3: Signal System](../phase03_signal_system/overview.md)

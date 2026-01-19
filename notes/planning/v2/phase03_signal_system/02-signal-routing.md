@@ -175,4 +175,4 @@ rm -f lib/jido_code_core/actions/track_file_read.ex
 rm -f lib/jido_code_core/actions/track_file_write.ex
 ```
 
-Proceed to [Section 3.3: PubSub Bridge](./03-pubsub-bridge.md)
+Proceed to [Section 3.3: Signal Dispatch](./03-signal-dispatch.md)

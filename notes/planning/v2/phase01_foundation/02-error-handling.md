@@ -1,6 +1,6 @@
 # Phase 1.2: Error Handling
 
-Migrate to Splode-based error handling while maintaining backward compatibility.
+Implement Splode-based structured error handling.
 
 ## Architecture
 
@@ -10,14 +10,14 @@ Migrate to Splode-based error handling while maintaining backward compatibility.
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │   ┌─────────────┐     ┌─────────────┐     ┌────────────┐  │
-│   │ Legacy Code │────>│ Error       │────>│ Splode     │  │
-│   │             │     │ Converters  │     │ Errors     │  │
+│   │ Application │────>│ Errors      │────>│ Splode     │  │
+│   │ Code        │     │ Module      │     │ Errors     │  │
 │   └─────────────┘     └─────────────┘     └────────────┘  │
 │         │                                       │          │
 │         v                                       v          │
 │   ┌────────────────────────────────────────────────────┐  │
-│   │              Unified Error Interface               │  │
-│   │  {:ok, result} | {:error, error_struct}           │  │
+│   │         Structured Error Interface                 │  │
+│   │  raise JidoCodeCore.Errors.SomeError.exception()  │  │
 │   └────────────────────────────────────────────────────┘  │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
@@ -27,41 +27,39 @@ Migrate to Splode-based error handling while maintaining backward compatibility.
 
 | File | Purpose |
 |------|---------|
-| `lib/jido_code_core/error.ex` | Existing error module |
-| `lib/jido_code_core/errors/` | New error module directory |
+| `lib/jido_code_core/errors.ex` | Error module with Splode setup |
+| `lib/jido_code_core/errors/*.ex` | Individual error classes |
 
 ---
 
 ## 1.2.1: Audit Current Error Patterns
 
-Document all existing error patterns before migration.
+Document existing error patterns for Splode migration.
 
 ### 1.2.1.1: Review Existing Error Module
 - [ ] Read `/home/ducky/code/agentjido/jido_code_core/lib/jido_code_core/error.ex`
 - [ ] Document all custom error types defined
 - [ ] Identify all error return patterns
 
-### 1.2.1.2: Scan for Tuple-Based Errors
+### 1.2.1.2: Identify Error Patterns
 - [ ] Search for `{:error, reason}` patterns in codebase
 - [ ] Document all unique error reason atoms
-- [ ] Identify error tuple locations in:
+- [ ] Identify error locations in:
   - `lib/jido_code_core/tools/executor.ex`
   - `lib/jido_code_core/session/state.ex`
   - `lib/jido_code_core/memory/`
 
 ### 1.2.1.3: Create Error Documentation
 - [ ] Document all error types in `notes/research/error_patterns.md`
-- [ ] Map legacy errors to Splode equivalents
-- [ ] Create error migration matrix
+- [ ] Map current errors to Splode equivalents
 
 ---
 
-## 1.2.2: Introduce Splode Error Wrappers
+## 1.2.2: Implement Splode Error Handling
 
-Add Splode-based error handling with backward compatibility.
+Add Splode-based error handling.
 
 ### 1.2.2.1: Create Error Module Structure
-- [ ] Create `lib/jido_code_core/errors/` directory
 - [ ] Create `lib/jido_code_core/errors.ex` with Splode setup:
 
 ```elixir
@@ -70,7 +68,8 @@ defmodule JidoCodeCore.Errors do
     session: JidoCodeCore.Errors.Session,
     tools: JidoCodeCore.Errors.Tools,
     memory: JidoCodeCore.Errors.Memory,
-    validation: JidoCodeCore.Errors.Validation
+    validation: JidoCodeCore.Errors.Validation,
+    agent: JidoCodeCore.Errors.Agent
   ]
 end
 ```
@@ -100,10 +99,11 @@ end
 - [ ] Define `SchemaValidationFailed` error
 - [ ] Define `InvalidSessionId` error
 
-### 1.2.2.6: Add Error Conversion Helpers
-- [ ] Add `from_legacy/1` function to convert tuple errors
-- [ ] Add `to_legacy/1` function for backward compatibility
-- [ ] Maintain existing error return patterns
+### 1.2.2.6: Create Agent Error Class
+- [ ] Create `lib/jido_code_core/errors/agent.ex`
+- [ ] Define `AgentNotRunning` error
+- [ ] Define `AgentStartupFailed` error
+- [ ] Define `AgentTimeout` error
 
 ---
 
@@ -111,24 +111,20 @@ end
 
 1. **Audit**: All error patterns documented
 2. **Splode Setup**: Error classes created and compiling
-3. **Conversion**: Legacy errors can convert to Splode
-4. **Backward Compatibility**: Existing code still works
-5. **Tests**: All existing error handling tests pass
+3. **Integration**: Errors integrate with existing code
+4. **Tests**: All error handling tests pass
 
 ## Files Modified
 
 | File | Lines Changed | Action |
 |------|--------------|--------|
-| `lib/jido_code_core/error.ex` | ~50 | Add Splode wrappers |
-| `lib/jido_code_core/errors.ex` | ~100 (new) | Create error classes |
-| `lib/jido_code_core/errors/*.ex` | ~50 each | Individual error classes |
+| `lib/jido_code_core/errors.ex` | ~100 (new) | Create error module |
+| `lib/jido_code_core/errors/*.ex` | ~50 each | Create error classes |
 
 ## Rollback Plan
 
 ```bash
 rm -rf lib/jido_code_core/errors/
-rm -f lib/jido_code_core/errors.ex
-git checkout lib/jido_code_core/error.ex
 ```
 
 Proceed to [Section 1.3: Base Types](./03-base-types.md)

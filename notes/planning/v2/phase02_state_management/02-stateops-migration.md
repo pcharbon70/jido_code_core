@@ -130,8 +130,8 @@ end
 1. **Mapping**: All state mutations mapped to StateOps
 2. **Builders**: SessionStateOps provides all necessary builders
 3. **Tests**: StateOp tests pass
-4. **Documentation**: Migration patterns documented
-5. **Compatibility**: StateOps produce equivalent results
+4. **Documentation**: StateOp patterns documented
+5. **Verification**: StateOps work correctly
 
 ## Files Modified
 

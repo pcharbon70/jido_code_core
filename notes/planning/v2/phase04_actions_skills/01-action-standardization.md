@@ -129,11 +129,10 @@ Verify schema validation works correctly.
 
 ## Phase 4.1 Success Criteria
 
-1. **Audit**: All current actions documented
+1. **Audit**: All actions documented
 2. **Schemas**: All actions use Zoi schemas
 3. **Validation**: Schema validation working
 4. **Tests**: All action tests pass
-5. **Backward Compat**: Existing code still works
 
 ## Files Modified
 

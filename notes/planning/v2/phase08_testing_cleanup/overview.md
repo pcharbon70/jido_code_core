@@ -1,43 +1,42 @@
-# Phase 8: Testing & Cleanup - Overview
+# Phase 8: Testing & Documentation - Overview
 
 ## Description
 
-Ensure comprehensive test coverage for migrated code and clean up deprecated patterns.
+Ensure comprehensive test coverage and complete documentation.
 
 ## Goal
 
-Complete the migration with quality assurance:
+Complete the project with quality assurance:
 1. Achieve comprehensive test coverage
-2. Remove all deprecated code
-3. Update documentation
+2. Ensure code quality
+3. Complete documentation
 
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                       Testing & Cleanup Activities                     │
+│                       Testing & Documentation Activities                 │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │   ┌─────────────────────────────────────────────────────────────────┐  │
 │   │                      Test Coverage                               │  │
-│   │  • Unit tests for all new modules                              │  │
-│   │  • Integration tests for Agent system                         │  │
+│   │  • Unit tests for all modules                                  │  │
+│   │  • Integration tests for Agent system                          │  │
 │   │  • Contract tests for Skills                                   │  │
-│   │  • Migration verification tests                               │  │
 │   └─────────────────────────────────────────────────────────────────┘  │
 │                                                                          │
 │   ┌─────────────────────────────────────────────────────────────────┐  │
-│   │                     Code Cleanup                                │  │
-│   │  • Remove deprecated GenServer code                           │  │
-│   │  • Remove legacy tool registry                                │  │
-│   │  • Clean up unused imports                                     │  │
+│   │                     Code Quality                                 │  │
+│   │  • Run static analysis                                         │  │
+│   │  • Format checking                                             │  │
+│   │  • Linting                                                     │  │
 │   └─────────────────────────────────────────────────────────────────┘  │
 │                                                                          │
 │   ┌─────────────────────────────────────────────────────────────────┐  │
 │   │                    Documentation                                │  │
-│   │  • Update README with new architecture                        │  │
-│   │  • Create migration guide                                    │  │
-│   │  • Update API documentation                                   │  │
+│   │  • Update README with architecture                             │  │
+│   │  • Create user guide                                           │  │
+│   │  • Update API documentation                                    │  │
 │   └─────────────────────────────────────────────────────────────────┘  │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -48,28 +47,27 @@ Complete the migration with quality assurance:
 | Component | Purpose |
 |-----------|---------|
 | Test Suite | Comprehensive coverage |
-| Cleanup Scripts | Remove deprecated code |
-| Documentation | Updated docs |
+| Code Quality | Linting and formatting |
+| Documentation | Complete docs |
 
 ## Phases in This Stage
 
 | Section | Document | Description |
 |---------|----------|-------------|
 | 8.1 | [01-test-coverage.md](./01-test-coverage.md) | Ensure coverage |
-| 8.2 | [02-deprecation-cleanup.md](./02-deprecation-cleanup.md) | Remove deprecated code |
-| 8.3 | [03-documentation.md](./03-documentation.md) | Update docs |
+| 8.2 | [02-code-quality.md](./02-code-quality.md) | Code quality checks |
+| 8.3 | [03-documentation.md](./03-documentation.md) | Complete docs |
 
 ## Success Criteria
 
 1. **Coverage**: Test coverage > 80%
 2. **Tests**: All tests passing
-3. **Cleanup**: All deprecated code removed
+3. **Quality**: Linting and formatting clean
 4. **Docs**: Documentation complete
-5. **Migration**: Migration guide published
 
 ## Dependencies on Previous Phases
 
-- **All Previous Phases**: Complete migration first
+- **All Previous Phases**: Complete implementation first
 
 ## Key References
 

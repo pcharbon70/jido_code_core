@@ -2,14 +2,14 @@
 
 ## Description
 
-Establish the foundational infrastructure for migrating JidoCodeCore to Jido 2.0 patterns. This phase focuses on dependency management, error handling migration, and base type definitions that will be used throughout the rest of the migration.
+Establish the foundational infrastructure for JidoCodeCore based on Jido 2.0 patterns. This phase focuses on dependency management, error handling implementation, and base type definitions that will be used throughout the application.
 
 ## Goal
 
-Create a solid foundation for the migration by:
+Create a solid foundation by:
 1. Ensuring all Jido 2.0 dependencies are properly configured
-2. Introducing Splode-based error handling with backward compatibility
-3. Defining base types and schemas for the new architecture
+2. Implementing Splode-based error handling
+3. Defining base types and schemas for the architecture
 
 ## Architecture Overview
 
@@ -20,8 +20,8 @@ Create a solid foundation for the migration by:
 │                                                                      │
 │  ┌─────────────────┐     ┌─────────────────┐     ┌─────────────┐  │
 │  │ Dependencies    │────>│ Error Handling  │────>│ Base Types  │  │
-│  │ Jido 2.0        │     │ Splode Wrappers │     │ Zoi Schemas │  │
-│  │ Jido.AI 2.0     │     │ Legacy Support  │     │ Converters  │  │
+│  │ Jido 2.0        │     │ Splode Errors   │     │ Zoi Schemas │  │
+│  │ Jido.AI 2.0     │     │                 │     │             │  │
 │  │ Zoi, Splode     │     │                 │     │             │  │
 │  └─────────────────┘     └─────────────────┘     └─────────────┘  │
 │                                                                      │
@@ -32,10 +32,9 @@ Create a solid foundation for the migration by:
 
 | Component | Purpose |
 |-----------|---------|
-| mix.exs | Update dependencies to Jido 2.0 compatible versions |
-| Error module | Introduce Splode-based error handling with legacy wrappers |
-| Agent.Schemas | Define Zoi schemas for session agent state |
-| Agent.Converters | Create bidirectional converters between Session and Agent |
+| mix.exs | Configure Jido 2.0 dependencies |
+| Errors module | Splode-based error handling |
+| Agent.Schemas | Zoi schemas for agent state |
 
 ## Phases in This Stage
 
@@ -43,14 +42,14 @@ Create a solid foundation for the migration by:
 |---------|----------|-------------|
 | 1.1 | [01-dependencies-build.md](./01-dependencies-build.md) | Update and verify all dependencies |
 | 1.2 | [02-error-handling.md](./02-error-handling.md) | Migrate to Splode error patterns |
-| 1.3 | [03-base-types.md](./03-base-types.md) | Define base types and converters |
+| 1.3 | [03-base-types.md](./03-base-types.md) | Define base types and schemas |
 
 ## Success Criteria
 
 1. **Dependencies**: All Jido 2.0 dependencies compile without conflicts
-2. **Error Handling**: Splode error helpers available and tested with backward compatibility
-3. **Base Types**: Schemas defined with validation, converters working bidirectionally
-4. **Test Coverage**: All existing tests still pass after changes
+2. **Error Handling**: Splode error helpers available and tested
+3. **Base Types**: Schemas defined with validation
+4. **Test Coverage**: All tests pass
 
 ## Dependencies on Previous Phases
 

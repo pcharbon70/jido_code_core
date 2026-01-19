@@ -1,6 +1,6 @@
-# Phase 6.1: AgentServer Adoption
+# Phase 6.1: AgentServer Setup
 
-Create CodeSessionAgentServer to replace Session.State GenServer.
+Create CodeSessionAgentServer for session management.
 
 ## Architecture
 
@@ -16,9 +16,8 @@ Create CodeSessionAgentServer to replace Session.State GenServer.
 │   │    signal_dispatcher: Jido.Signal.Dispatch               │  │
 │   └─────────────────────────────────────────────────────────┘  │
 │                            │                                    │
-│                            ├──> PubSubBridge (child)            │
-│                            ├──> Child Agents (optional)         │
-│                            └──> Other processes                  │
+│                            ├──> Child processes (optional)     │
+│                            └──> Other services                 │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -44,8 +43,6 @@ Create AgentServer wrapper for CodeSessionAgent.
 defmodule JidoCodeCore.Agent.Server do
   @moduledoc """
   AgentServer wrapper for CodeSessionAgent.
-
-  Replaces the Session.State GenServer with Jido.AgentServer pattern.
   """
 
   use Jido.AgentServer,
@@ -56,8 +53,7 @@ defmodule JidoCodeCore.Agent.Server do
   # Optional: Add child processes
   def children(_agent, _opts) do
     [
-      # PubSub bridge for backward compatibility
-      {JidoCodeCore.Signals.PubSubBridge, []}
+      # Child processes can be added here
     ]
   end
 end
@@ -77,28 +73,21 @@ end
 
 ## 6.1.2: Update Session Supervisor
 
-Replace Session.State with AgentServer.
+Add AgentServer to supervision tree.
 
 ### 6.1.2.1: Update Supervisor Children
 - [ ] Open `lib/jido_code_core/session/supervisor.ex`
-- [ ] Replace Session.State child spec
+- [ ] Add AgentServer child spec
 
 ```elixir
-# Before
-{JidoCodeCore.Session.State, [session: session]}
-
-# After (with feature flag)
-if Application.get_env(:jido_code_core, :agent_mode, false) do
-  {JidoCodeCore.Agent.Server, [agent_opts: [initial_state: to_agent_state(session)]]}
-else
-  {JidoCodeCore.Session.State, [session: session]}
-end
+children = [
+  {JidoCodeCore.Agent.Server, [agent_opts: opts]}
+]
 ```
 
 ### 6.1.2.2: Add ProcessRegistry Support
 - [ ] Ensure AgentServer registers with ProcessRegistry
-- [ ] Support existing lookup patterns
-- [ ] Maintain compatibility
+- [ ] Support lookup patterns
 
 ---
 
@@ -107,12 +96,10 @@ end
 Configure AgentServer behavior.
 
 ### 6.1.3.1: Add Configuration Options
-- [ ] Add `:agent_mode` config flag
 - [ ] Add `:server_timeout` config
 - [ ] Add `:max_iterations` for ReAct
 
-### 6.1.3.2: Add Runtime Configuration
-- [ ] Support runtime mode switching
+### 6.1.3.2: Add Configuration Validation
 - [ ] Add configuration validation
 - [ ] Document configuration options
 
@@ -123,8 +110,7 @@ Configure AgentServer behavior.
 1. **AgentServer**: CodeSessionAgentServer compiles
 2. **Supervisor**: Updated with AgentServer child
 3. **Registry**: ProcessRegistry integration working
-4. **Configuration**: Feature flag functional
-5. **Tests**: Server tests pass
+4. **Tests**: Server tests pass
 
 ## Files Modified
 
@@ -144,4 +130,4 @@ git checkout config/config.exs
 rm -f test/jido_code_core/agent/server_test.exs
 ```
 
-Proceed to [Section 6.2: State Data Migration](./02-state-data-migration.md)
+Proceed to [Section 6.2: State Initialization](./02-state-initialization.md)

@@ -2,14 +2,14 @@
 
 ## Description
 
-Complete the signal system by defining all signal types, establishing signal routing patterns, and creating a PubSub bridge for backward compatibility with existing subscribers.
+Complete the signal system by defining all signal types and establishing signal routing patterns for the agent.
 
 ## Goal
 
 Establish a complete signal-based event system:
 1. Define all JidoCodeCore signal types
 2. Set up signal routing for CodeSessionAgent
-3. Create PubSub bridge for backward compatibility
+3. Integrate with Jido.Signal dispatch
 
 ## Architecture Overview
 
@@ -26,15 +26,9 @@ Establish a complete signal-based event system:
 │           │                                                       │    │
 │           ▼                                                       ▼    │
 │  ┌─────────────────┐     Dispatch    ┌──────────────┐                  │
-│  │ PubSub Bridge   │<────────────────│ PubSubAdapter │                  │
-│  │ (backward compat)│    Signal.Emit │              │                  │
+│  │ Jido.Signal     │<────────────────│ Subscribers  │                  │
+│  │ Dispatch        │                 │              │                  │
 │  └─────────────────┘                  └──────────────┘                  │
-│           │                                                               │
-│           ▼                                                               │
-│  ┌─────────────────┐                                                   │
-│  │ Existing Subs   │                                                   │
-│  │ (TUI, etc.)     │                                                   │
-│  └─────────────────┘                                                   │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -45,8 +39,7 @@ Establish a complete signal-based event system:
 |-----------|---------|
 | Signals Module | All signal type definitions |
 | Signal Router | Route signals to actions |
-| PubSub Bridge | Bridge between Jido.Signal and Phoenix.PubSub |
-| PubSub Adapter | Convert PubSub events to signals |
+| Jido.Signal.Dispatch | Signal dispatch system |
 
 ## Phases in This Stage
 
@@ -54,15 +47,13 @@ Establish a complete signal-based event system:
 |---------|----------|-------------|
 | 3.1 | [01-signal-types.md](./01-signal-types.md) | Define all signal types |
 | 3.2 | [02-signal-routing.md](./02-signal-routing.md) | Set up signal routing |
-| 3.3 | [03-pubsub-bridge.md](./03-pubsub-bridge.md) | Create PubSub bridge |
 
 ## Success Criteria
 
 1. **Signals**: All signal types defined and validated
 2. **Routing**: Signal routes working correctly
-3. **Bridge**: PubSub bridge functional
-4. **Compatibility**: Existing subscribers still receive events
-5. **Tests**: All signal system tests pass
+3. **Dispatch**: Signal dispatch integrated
+4. **Tests**: All signal system tests pass
 
 ## Dependencies on Previous Phases
 

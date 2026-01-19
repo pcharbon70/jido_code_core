@@ -61,8 +61,7 @@ Transform the tool system:
 1. **Tool Actions**: All tools available as actions
 2. **Agent Executor**: Executor using Agent patterns
 3. **ToolSkill**: Aggregate skill functional
-4. **Compatibility**: Legacy tool API still works
-5. **Tests**: All tool tests pass
+4. **Tests**: All tool tests pass
 
 ## Dependencies on Previous Phases
 

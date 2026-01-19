@@ -40,8 +40,7 @@ Refactor Tools.Executor to use Agent cmd/2 pattern.
 
 | File | Purpose |
 |------|---------|
-| `lib/jido_code_core/tools/agent_executor.ex` | New Agent-based executor |
-| `lib/jido_code_core/tools/executor.ex` | Legacy executor (compatibility) |
+| `lib/jido_code_core/tools/executor.ex` | Agent-based executor |
 
 ---
 
@@ -49,12 +48,12 @@ Refactor Tools.Executor to use Agent cmd/2 pattern.
 
 New executor using Agent cmd/2 pattern.
 
-### 5.2.1.1: Create AgentExecutor Module
-- [ ] Create `lib/jido_code_core/tools/agent_executor.ex`
-- [ ] Implement execute/2 function
+### 5.2.1.1: Refactor Executor Module
+- [ ] Open `lib/jido_code_core/tools/executor.ex`
+- [ ] Implement execute/2 using Agent cmd/2
 
 ```elixir
-defmodule JidoCodeCore.Tools.AgentExecutor do
+defmodule JidoCodeCore.Tools.Executor do
   @moduledoc """
   Agent-based tool executor using Jido.Agent cmd/2.
   """
@@ -100,52 +99,22 @@ end
 
 ---
 
-## 5.2.2: Add Compatibility Layer
-
-Maintain old executor API during migration.
-
-### 5.2.2.1: Update Legacy Executor
-- [ ] Open `lib/jido_code_core/tools/executor.ex`
-- [ ] Add feature flag for new executor
-- [ ] Delegate to AgentExecutor when enabled
-
-```elixir
-def execute(tool_call, opts \\ []) do
-  if Application.get_env(:jido_code_core, :agent_executor_enabled, false) do
-    AgentExecutor.execute(tool_call, opts)
-  else
-    # Legacy execution path
-    execute_legacy(tool_call, opts)
-  end
-end
-```
-
-### 5.2.2.2: Maintain Legacy Path
-- [ ] Keep existing execution logic
-- [ ] Add deprecation warning
-- [ ] Document migration path
-
----
-
 ## Phase 5.2 Success Criteria
 
-1. **AgentExecutor**: New executor working
-2. **Compatibility**: Legacy API still works
-3. **Feature Flag**: Can toggle between executors
-4. **Results**: Both produce same results
-5. **Tests**: All executor tests pass
+1. **Executor**: Agent-based executor working
+2. **Signals**: Tool execution via signals
+3. **Results**: Results extracted correctly
+4. **Tests**: All executor tests pass
 
 ## Files Modified
 
 | File | Lines Changed | Action |
 |------|--------------|--------|
-| `lib/jido_code_core/tools/agent_executor.ex` | ~200 (new) | New executor |
-| `lib/jido_code_core/tools/executor.ex` | +30 | Add compatibility |
+| `lib/jido_code_core/tools/executor.ex` | ~150 | Refactor to Agent |
 
 ## Rollback Plan
 
 ```bash
-rm -f lib/jido_code_core/tools/agent_executor.ex
 git checkout lib/jido_code_core/tools/executor.ex
 ```
 

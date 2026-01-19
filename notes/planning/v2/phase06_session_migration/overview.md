@@ -1,37 +1,34 @@
-# Phase 6: Session Migration - Overview
+# Phase 6: Session Management - Overview
 
 ## Description
 
-Migrate from the Session.State GenServer to Jido.AgentServer while maintaining backward compatibility for existing APIs.
+Set up Jido.AgentServer for session management.
 
 ## Goal
 
-Replace GenServer-based session with Agent pattern:
-1. Adopt AgentServer for session management
-2. Migrate existing session state data
-3. Maintain API compatibility during transition
+Implement Agent-based session management:
+1. Create AgentServer for session management
+2. Set up state initialization
+3. Implement Session API
 
 ## Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                       Session Migration Architecture                     │
+│                       Session Architecture                              │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│   Current (GenServer)                 Target (AgentServer)                 │
-│   ─────────────────────                 ─────────────────                 │
-│                                                                          │
-│   ┌─────────────────┐                  ┌─────────────────┐               │
-│   │ Session.State    │                  │ CodeSessionAgent │               │
-│   │ GenServer        │       ───────>   │ + AgentServer    │               │
-│   │ 1969 lines       │                  │ pure functional  │               │
-│   └─────────────────┘                  └────────┬────────┘               │
-│                                                 │                        │
-│                                                 ▼                        │
-│   ┌─────────────────┐                  ┌─────────────────┐               │
-│   │ Session.Manager │                  │ SessionAPI      │               │
-│   │ (client API)     │       ───────>   │ (compat layer)  │               │
-│   └─────────────────┘                  └─────────────────┘               │
+│   ┌─────────────────┐                                                  │
+│   │ CodeSessionAgent │                                                  │
+│   │ + AgentServer    │                                                  │
+│   │ pure functional  │                                                  │
+│   └────────┬────────┘                                                  │
+│            │                                                            │
+│            ▼                                                            │
+│   ┌─────────────────┐                                                  │
+│   │ SessionAPI      │                                                  │
+│   │ (client API)    │                                                  │
+│   └─────────────────┘                                                  │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -41,29 +38,27 @@ Replace GenServer-based session with Agent pattern:
 | Component | Purpose |
 |-----------|---------|
 | CodeSessionAgentServer | AgentServer wrapper for CodeSessionAgent |
-| State Migrator | Convert Session.State to Agent state |
-| Session API Adapter | Maintain backward compatibility |
-| Feature Flag | Enable/disable Agent mode |
+| State Initializer | Initialize session state |
+| Session API | Client API for session operations |
 
 ## Phases in This Stage
 
 | Section | Document | Description |
 |---------|----------|-------------|
-| 6.1 | [01-agentserver-adoption.md](./01-agentserver-adoption.md) | Adopt AgentServer |
-| 6.2 | [02-state-data-migration.md](./02-state-data-migration.md) | Migrate state data |
-| 6.3 | [03-api-compatibility.md](./03-api-compatibility.md) | API compatibility layer |
+| 6.1 | [01-agentserver-adoption.md](./01-agentserver-adoption.md) | Set up AgentServer |
+| 6.2 | [02-state-initialization.md](./02-state-initialization.md) | Initialize state |
+| 6.3 | [03-session-api.md](./03-session-api.md) | Session API |
 
 ## Success Criteria
 
 1. **AgentServer**: CodeSessionAgentServer running
-2. **Migration**: State data migrates correctly
-3. **Compatibility**: Existing APIs still work
-4. **Feature Flag**: Can toggle between modes
-5. **Tests**: All session tests pass
+2. **State**: Session state initializes correctly
+3. **API**: Session API functional
+4. **Tests**: All session tests pass
 
 ## Dependencies on Previous Phases
 
-- **Phase 1**: Base types and converters
+- **Phase 1**: Base types
 - **Phase 2**: Agent structure and StateOps
 - **Phase 3**: Signal system
 - **Phase 4**: Skills
@@ -72,7 +67,5 @@ Replace GenServer-based session with Agent pattern:
 ## Key References
 
 - [Jido.AgentServer Documentation](../../../jido/lib/jido/agent_server.ex)
-- [Session.State](../../lib/jido_code_core/session/state.ex)
-- [Session.Manager](../../lib/jido_code_core/session/manager.ex)
 
-Proceed to [Section 6.1: AgentServer Adoption](./01-agentserver-adoption.md)
+Proceed to [Section 6.1: AgentServer Setup](./01-agentserver-adoption.md)
